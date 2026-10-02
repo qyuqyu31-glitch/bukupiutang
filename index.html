@@ -63,11 +63,11 @@
         <!-- KARTU RINGKASAN KEUANGAN -->
         <div id="wrapperRingkasan" class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
             <div class="bg-emerald-50 border border-emerald-200 p-3.5 rounded-xl shadow-sm">
-                <p class="text-[11px] uppercase tracking-wider text-emerald-600 font-semibold">Total Piutang</p>
+                <p class="text-[11px] uppercase tracking-wider text-emerald-600 font-semibold">Total Piutang Aktif</p>
                 <p id="valTotalPiutangSaja" class="text-xl font-bold text-emerald-700 mt-1">Rp 0</p>
             </div>
             <div class="bg-rose-50 border border-rose-200 p-3.5 rounded-xl shadow-sm">
-                <p class="text-[11px] uppercase tracking-wider text-rose-600 font-semibold">Total Hutang</p>
+                <p class="text-[11px] uppercase tracking-wider text-rose-600 font-semibold">Total Hutang Aktif</p>
                 <p id="valTotalHutangSaja" class="text-xl font-bold text-rose-700 mt-1">Rp 0</p>
             </div>
         </div>
@@ -142,6 +142,25 @@
             </form>
         </div>
 
+        <!-- MODAL / POP UP PELUNASAN -->
+        <div id="modalPelunasan" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <div class="bg-white rounded-xl max-w-md w-full p-6 shadow-2xl border border-slate-200">
+                <h3 class="text-base font-bold text-slate-900 mb-2">✨ Verifikasi Pelunasan</h3>
+                <p id="teksInfoPelunasan" class="text-xs text-slate-600 mb-4">Masukkan tanggal pelunasan transaksi ini. Jika dikosongkan, sistem akan otomatis menggunakan tanggal hari ini.</p>
+                
+                <form onsubmit="prosesPelunasan(event)">
+                    <div class="mb-4">
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Tanggal Pelunasan</label>
+                        <input type="date" id="tanggalPelunasanInput" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm shadow-sm">
+                    </div>
+                    <div class="flex gap-2 justify-end">
+                        <button type="button" onclick="tutupModalPelunasan()" class="bg-white hover:bg-slate-100 text-slate-700 font-medium py-2 px-4 rounded-lg text-xs border border-slate-300 transition cursor-pointer">Batal</button>
+                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg text-xs transition cursor-pointer shadow-sm">Konfirmasi Lunas</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
         <!-- TABEL & FILTER -->
         <div class="shadow-sm overflow-hidden mb-6 bg-slate-100 border border-slate-300 rounded-xl">
             <div class="p-3 sm:p-4 border-b border-slate-300 bg-slate-100 flex items-center justify-between gap-2 flex-wrap">
@@ -181,6 +200,7 @@
         let seluruhTransaksi = [];
         let akunAktif = localStorage.getItem('akun_aktif_piutang_ online') || "Pencatatan Piutang Toko";
         let statusFilter = 'Semua';
+        let idTrxDipilihUntukLunas = null;
 
         function formatInputRupiah(input) {
             let angkaBersih = input.value.replace(/[^0-9]/g, '');
@@ -240,7 +260,6 @@
             document.getElementById('judulAkunAktif').innerText = akunAktif;
             document.getElementById('labelAkunDiMenu').innerText = akunAktif;
 
-            // Kumpulkan daftar akun unik dari data
             let daftarAkunSet = new Set(["Pencatatan Piutang Toko"]);
             seluruhTransaksi.forEach(item => {
                 if (item.Akun) daftarAkunSet.add(item.Akun);
@@ -269,7 +288,6 @@
             btnBuatAkunBaru.onclick = () => tambahBukuKasBaru();
             daftarPilihanAkunEl.appendChild(btnBuatAkunBaru);
 
-            // Filter transaksi berdasarkan akun aktif
             let transaksiAkunIni = seluruhTransaksi.filter(item => (item.Akun || "Pencatatan Piutang Toko") === akunAktif);
             
             let totalPiutang = 0, totalHutang = 0;
@@ -282,7 +300,6 @@
             document.getElementById('valTotalPiutangSaja').innerText = `Rp ${totalPiutang.toLocaleString('id-ID')}`;
             document.getElementById('valTotalHutangSaja').innerText = `Rp ${totalHutang.toLocaleString('id-ID')}`;
 
-            // Render Filter
             const filterContainer = document.getElementById('filterContainer');
             filterContainer.innerHTML = `
                 <button type="button" onclick="setFilter('Semua')" id="fSemua" class="font-medium py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 shadow-sm shrink-0"><span>📋</span> <span>Semua</span></button>
@@ -312,7 +329,7 @@
                 return true;
             });
 
-            // Urutkan dari yang terbaru (berdasarkan ID berbasis waktu atau tanggal)
+            // Urutkan agar transaksi terbaru berada di paling atas
             transaksiDitampilkan.reverse();
 
             const tabelData = document.getElementById('tabelData');
@@ -337,6 +354,7 @@
                         <td class="p-3 text-slate-600 text-xs">${item.Keterangan || '-'}</td>
                         <td class="p-3 text-center space-x-1 whitespace-nowrap">
                             ${linkWA}
+                            <button type="button" onclick="bukaModalPelunasan('${item.ID}')" class="bg-blue-100 hover:bg-blue-600 hover:text-white text-blue-700 px-2 py-1 rounded text-xs transition cursor-pointer font-medium" title="Tandai Lunas">Lunas</button>
                             <button type="button" onclick="hapusDataOnline('${item.ID}')" class="bg-slate-200 hover:bg-rose-600 hover:text-white text-slate-700 px-2 py-1 rounded text-xs transition cursor-pointer" title="Hapus">Hapus</button>
                         </td>
                     </tr>
@@ -344,8 +362,52 @@
             });
         }
 
-        function simpanTransaksiOnline(e, kategori) {
+        function bukaModalPelunasan(idTrx) {
+            idTrxDipilihUntukLunas = idTrx;
+            const hariIni = new Date().toISOString().split('T')[0];
+            document.getElementById('tanggalPelunasanInput').value = hariIni;
+            document.getElementById('modalPelunasan').classList.remove('hidden');
+        }
+
+        function tutupModalPelunasan() {
+            document.getElementById('modalPelunasan').classList.add('hidden');
+            idTrxDipilihUntukLunas = null;
+        }
+
+        function prosesPelunasan(e) {
             e.preventDefault();
+            if (!idTrxDipilihUntukLunas) return;
+
+            let tglLunas = document.getElementById('tanggalPelunasanInput').value;
+            if (!tglLunas) {
+                tglLunas = new Date().toISOString().split('T')[0];
+            }
+
+            const tabelBody = document.getElementById('tabelData');
+            tabelBody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-blue-600 font-medium italic">Memproses pelunasan...</td></tr>`;
+
+            const payload = {
+                action: 'hapus', // Menggunakan aksi hapus baris dari spreadsheet
+                id: idTrxDipilihUntukLunas
+            };
+
+            fetch(WEB_APP_URL, {
+                method: 'POST',
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.json())
+            .then(res => {
+                tutupModalPelunasan();
+                muatDataDariServer();
+            })
+            .catch(err => {
+                alert("Gagal memproses pelunasan!");
+                muatDataDariServer();
+            });
+        }
+
+        function simpanTransaksiOnline(event, kategori) {
+            event.preventDefault();
             let rawJumlah, tanggal, nama, keterangan, btnSubmit;
 
             if (kategori === 'Piutang') {
@@ -479,7 +541,6 @@
             }
             if (namaBaru === akunAktif) return;
             
-            // Mengubah nama akun pada data lokal memori lalu refresh
             seluruhTransaksi.forEach(item => {
                 if ((item.Akun || "Pencatatan Piutang Toko") === akunAktif) {
                     item.Akun = namaBaru;
