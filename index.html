@@ -312,6 +312,9 @@
                 return true;
             });
 
+            // Urutkan dari yang terbaru (berdasarkan ID berbasis waktu atau tanggal)
+            transaksiDitampilkan.reverse();
+
             const tabelData = document.getElementById('tabelData');
             tabelData.innerHTML = '';
 
