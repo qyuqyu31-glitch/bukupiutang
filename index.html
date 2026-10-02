@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi Buku Kas Khusus Piutang & Hutang (Online)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans">
+
+    <!-- Container Utama -->
+    <div class="max-w-4xl mx-auto p-4 sm:p-6">
+        
+        <!-- Header & Navigasi Akun -->
+        <header class="mb-6 bg-white p-3 sm:p-4 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between gap-3">
+            
+            <div class="flex items-center gap-3 w-full">
+                <!-- Tombol Menu Pengaturan & Dropdown -->
+                <div class="relative z-30 shrink-0">
+                    <button type="button" id="btnMenuAkun" onclick="toggleMenuAksiAkun(event)" class="bg-slate-900 hover:bg-black text-white p-2.5 rounded-lg text-sm transition cursor-pointer flex items-center justify-center border border-white/20 shadow-sm" title="Menu Pengaturan">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+
+                    <!-- Menu Dropdown Utama -->
+                    <div id="menuAksiAkun" class="hidden absolute left-0 mt-0 w-72 bg-white border border-t-0 border-slate-200 rounded-b-xl rounded-tr-xl shadow-2xl z-50 p-2 space-y-2">
+                        <div class="text-xs font-semibold text-slate-400 px-3 py-1 uppercase tracking-wider border-b border-slate-100 mb-1">Pengaturan & Akun</div>
+                        
+                        <div class="relative">
+                            <button type="button" onclick="toggleSubMenuAkun(event)" class="w-full text-left px-3 py-2 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition flex items-center justify-between gap-2 cursor-pointer border border-slate-200">
+                                <span class="truncate">🔄 Akun: <span id="labelAkunDiMenu" class="text-blue-600 font-bold">Nama Akun</span></span>
+                                <span class="text-slate-400">▾</span>
+                            </button>
+
+                            <div id="subMenuGantiAkun" class="hidden mt-1 pl-2 space-y-1 max-h-40 overflow-y-auto border-l-2 border-blue-200">
+                                <div id="daftarPilihanAkun" class="space-y-1">
+                                    <!-- Daftar akun -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="button" onclick="hapusAkunAktif()" class="w-full text-left px-3 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 rounded-lg transition flex items-center gap-2 cursor-pointer">
+                            🗑️ Hapus Akun Ini
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Informasi Akun -->
+                <div class="flex flex-col min-w-0 flex-1">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <h1 id="judulAkunAktif" class="text-base sm:text-xl font-bold text-slate-900 truncate">Pencatatan Piutang Toko</h1>
+                        <button type="button" onclick="editNamaAkun()" class="text-[11px] bg-slate-100 hover:bg-slate-200 text-slate-600 px-2 py-0.5 rounded transition font-medium border border-slate-300 cursor-pointer shrink-0" title="Ubah Nama">Edit</button>
+                    </div>
+                    <div class="flex items-center gap-2 flex-wrap mt-0.5">
+                        <span id="keteranganAkunAktif" class="text-xs text-slate-500 truncate italic">Sinkronisasi Real-Time Google Sheets</span>
+                    </div>
+                </div>
+            </div>
+
+        </header>
+
+        <!-- KARTU RINGKASAN KEUANGAN -->
+        <div id="wrapperRingkasan" class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+            <div class="bg-emerald-50 border border-emerald-200 p-3.5 rounded-xl shadow-sm">
+                <p class="text-[11px] uppercase tracking-wider text-emerald-600 font-semibold">Total Piutang</p>
+                <p id="valTotalPiutangSaja" class="text-xl font-bold text-emerald-700 mt-1">Rp 0</p>
+            </div>
+            <div class="bg-rose-50 border border-rose-200 p-3.5 rounded-xl shadow-sm">
+                <p class="text-[11px] uppercase tracking-wider text-rose-600 font-semibold">Total Hutang</p>
+                <p id="valTotalHutangSaja" class="text-xl font-bold text-rose-700 mt-1">Rp 0</p>
+            </div>
+        </div>
+
+        <!-- TOMBOL AKSI LANGSUNG -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+            <button type="button" onclick="bukaFormPiutang('Piutang')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-4 rounded-xl text-sm transition cursor-pointer flex items-center justify-center gap-2 shadow-sm">
+                <span>📗</span> <span>Catat Piutang</span>
+            </button>
+            <button type="button" onclick="bukaFormPiutang('Hutang')" class="bg-rose-600 hover:bg-rose-700 text-white font-semibold py-3 px-4 rounded-xl text-sm transition cursor-pointer flex items-center justify-center gap-2 shadow-sm">
+                <span>📕</span> <span>Catat Hutang</span>
+            </button>
+        </div>
+
+        <!-- FORM: PIUTANG -->
+        <div id="containerFormPiutang" class="hidden p-5 shadow-md mb-6 transition-all bg-emerald-100/90 border-2 border-emerald-600 rounded-xl">
+            <div class="flex justify-between items-center mb-4 pb-2 border-b border-black/10">
+                <h2 class="text-base font-bold text-slate-900">📗 Form Catat Piutang Baru</h2>
+                <button type="button" onclick="tutupForm()" class="text-slate-700 hover:text-slate-900 font-bold text-sm px-2 py-1 cursor-pointer">✕ Tutup</button>
+            </div>
+            <form id="formPiutang" onsubmit="simpanTransaksiOnline(event, 'Piutang')" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-800 mb-1">Tanggal Transaksi</label>
+                    <input type="date" id="tanggalPiutang" required class="w-full px-3 py-2 bg-white border border-slate-400 rounded-lg text-sm shadow-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-800 mb-1">Nama Pihak / Debitur</label>
+                    <input type="text" id="namaPiutang" required placeholder="Contoh: Bpk. Budi" class="w-full px-3 py-2 bg-white border border-slate-400 rounded-lg text-sm shadow-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-800 mb-1">Nominal Piutang (Rp)</label>
+                    <input type="text" id="jumlahPiutang" inputmode="numeric" required placeholder="Contoh: Rp 500.000" oninput="formatInputRupiah(this)" class="w-full px-3 py-2 bg-white border border-slate-400 rounded-lg text-sm font-semibold shadow-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-800 mb-1">Keterangan / Keperluan</label>
+                    <input type="text" id="keteranganPiutang" placeholder="Contoh: Pinjaman" class="w-full px-3 py-2 bg-white border border-slate-400 rounded-lg text-sm shadow-sm">
+                </div>
+                <div class="sm:col-span-2 flex gap-2 pt-2">
+                    <button type="submit" id="btnSubmitPiutang" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 px-4 rounded-lg text-sm shadow-sm cursor-pointer">Simpan Piutang</button>
+                    <button type="button" onclick="tutupForm()" class="bg-white hover:bg-slate-100 text-slate-800 font-medium py-3 px-4 rounded-lg text-sm border border-slate-400 shadow-sm cursor-pointer">Batal</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- FORM: HUTANG -->
+        <div id="containerFormHutang" class="hidden p-5 shadow-md mb-6 transition-all bg-rose-100/90 border-2 border-rose-600 rounded-xl">
+            <div class="flex justify-between items-center mb-4 pb-2 border-b border-black/10">
+                <h2 class="text-base font-bold text-slate-900">📕 Form Catat Hutang Baru</h2>
+                <button type="button" onclick="tutupForm()" class="text-slate-700 hover:text-slate-900 font-bold text-sm px-2 py-1 cursor-pointer">✕ Tutup</button>
+            </div>
+            <form id="formHutang" onsubmit="simpanTransaksiOnline(event, 'Hutang')" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-800 mb-1">Tanggal Transaksi</label>
+                    <input type="date" id="tanggalHutang" required class="w-full px-3 py-2 bg-white border border-slate-400 rounded-lg text-sm shadow-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-800 mb-1">Nama Pihak / Kreditur</label>
+                    <input type="text" id="namaHutang" required placeholder="Contoh: Supplier" class="w-full px-3 py-2 bg-white border border-slate-400 rounded-lg text-sm shadow-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-800 mb-1">Nominal Hutang (Rp)</label>
+                    <input type="text" id="jumlahHutang" inputmode="numeric" required placeholder="Contoh: Rp 1.000.000" oninput="formatInputRupiah(this)" class="w-full px-3 py-2 bg-white border border-slate-400 rounded-lg text-sm font-semibold shadow-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-800 mb-1">Keterangan / Keperluan</label>
+                    <input type="text" id="keteranganHutang" placeholder="Contoh: Utang barang" class="w-full px-3 py-2 bg-white border border-slate-400 rounded-lg text-sm shadow-sm">
+                </div>
+                <div class="sm:col-span-2 flex gap-2 pt-2">
+                    <button type="submit" id="btnSubmitHutang" class="flex-1 bg-rose-600 hover:bg-rose-700 text-white font-medium py-3 px-4 rounded-lg text-sm shadow-sm cursor-pointer">Simpan Hutang</button>
+                    <button type="button" onclick="tutupForm()" class="bg-white hover:bg-slate-100 text-slate-800 font-medium py-3 px-4 rounded-lg text-sm border border-slate-400 shadow-sm cursor-pointer">Batal</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- TABEL & FILTER -->
+        <div class="shadow-sm overflow-hidden mb-6 bg-slate-100 border border-slate-300 rounded-xl">
+            <div class="p-3 sm:p-4 border-b border-slate-300 bg-slate-100 flex items-center justify-between gap-2 flex-wrap">
+                <div id="filterContainer" class="flex flex-row items-center gap-1.5 sm:gap-2 overflow-x-auto whitespace-nowrap">
+                    <!-- Tombol Filter -->
+                </div>
+                <button type="button" onclick="muatDataDariServer()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium px-3 py-1.5 rounded-lg transition cursor-pointer flex items-center gap-1 shadow-sm">
+                    <span>🔄</span> <span>Sinkronkan Data</span>
+                </button>
+            </div>
+
+            <div class="overflow-x-auto bg-white">
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead>
+                        <tr class="bg-slate-200 text-slate-700 uppercase text-xs">
+                            <th class="p-3">Tanggal</th>
+                            <th class="p-3">Nama Pihak</th>
+                            <th class="p-3">Kategori</th>
+                            <th class="p-3">Jumlah</th>
+                            <th class="p-3">Keterangan</th>
+                            <th class="p-3 text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelData" class="divide-y divide-slate-200">
+                        <tr><td colspan="6" class="p-4 text-center text-slate-400 italic">Memuat data dari server...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Skrip JavaScript Online -->
+    <script>
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwwj0jV1Xa2-IeRlnBtia8knBTCVgTs67szqg8Ci8B0CdwsVNAufdbsxq0i9DKtzhz7TA/exec";
+        
+        let seluruhTransaksi = [];
+        let akunAktif = localStorage.getItem('akun_aktif_piutang_ online') || "Pencatatan Piutang Toko";
+        let statusFilter = 'Semua';
+
+        function formatInputRupiah(input) {
+            let angkaBersih = input.value.replace(/[^0-9]/g, '');
+            if (angkaBersih === '') {
+                input.value = '';
+                return;
+            }
+            let angkaFormat = Number(angkaBersih).toLocaleString('id-ID');
+            input.value = `Rp ${angkaFormat}`;
+        }
+
+        function bukaFormPiutang(jenis) {
+            tutupForm();
+            const hariIni = new Date().toISOString().split('T')[0];
+
+            if (jenis === 'Piutang') {
+                const el = document.getElementById('containerFormPiutang');
+                el.classList.remove('hidden');
+                if (!document.getElementById('tanggalPiutang').value) document.getElementById('tanggalPiutang').value = hariIni;
+                el.scrollIntoView({ behavior: 'smooth' });
+            } else {
+                const el = document.getElementById('containerFormHutang');
+                el.classList.remove('hidden');
+                if (!document.getElementById('tanggalHutang').value) document.getElementById('tanggalHutang').value = hariIni;
+                el.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function tutupForm() {
+            document.getElementById('containerFormPiutang').classList.add('hidden');
+            document.getElementById('containerFormHutang').classList.add('hidden');
+        }
+
+        function setFilter(filter) {
+            statusFilter = filter;
+            renderApp();
+        }
+
+        // Ambil Data dari Google Sheets
+        function muatDataDariServer() {
+            const tabelBody = document.getElementById('tabelData');
+            tabelBody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-blue-600 font-medium italic">Menghubungkan ke server...</td></tr>`;
+
+            fetch(WEB_APP_URL)
+                .then(response => response.json())
+                .then(data => {
+                    seluruhTransaksi = data;
+                    renderApp();
+                })
+                .catch(error => {
+                    console.error('Gagal memuat:', error);
+                    tabelBody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-rose-600 font-medium">Gagal memuat data. Cek koneksi internet Anda.</td></tr>`;
+                });
+        }
+
+        function renderApp() {
+            document.getElementById('judulAkunAktif').innerText = akunAktif;
+            document.getElementById('labelAkunDiMenu').innerText = akunAktif;
+
+            // Kumpulkan daftar akun unik dari data
+            let daftarAkunSet = new Set(["Pencatatan Piutang Toko"]);
+            seluruhTransaksi.forEach(item => {
+                if (item.Akun) daftarAkunSet.add(item.Akun);
+            });
+
+            const daftarPilihanAkunEl = document.getElementById('daftarPilihanAkun');
+            daftarPilihanAkunEl.innerHTML = '';
+            
+            daftarAkunSet.forEach(namaAkun => {
+                let isAktif = (namaAkun === akunAktif);
+                let bgClass = isAktif ? 'bg-blue-100 text-blue-800 font-semibold' : 'text-slate-600 hover:bg-slate-100';
+                let iconCheck = isAktif ? ' ✓' : '';
+
+                let itemBtn = document.createElement('button');
+                itemBtn.type = 'button';
+                itemBtn.className = `w-full text-left px-2.5 py-1.5 text-xs rounded-lg transition cursor-pointer flex justify-between items-center ${bgClass}`;
+                itemBtn.innerHTML = `<span class="truncate">${namaAkun}</span><span class="text-blue-600 font-bold shrink-0">${iconCheck}</span>`;
+                itemBtn.onclick = () => { gantiAkun(namaAkun); tutupMenuAksi(); };
+                daftarPilihanAkunEl.appendChild(itemBtn);
+            });
+
+            let btnBuatAkunBaru = document.createElement('button');
+            btnBuatAkunBaru.type = 'button';
+            btnBuatAkunBaru.className = 'w-full text-left px-2.5 py-2 text-xs font-semibold text-blue-600 hover:bg-blue-50 rounded-lg transition flex items-center gap-2 cursor-pointer mt-1 border-t border-slate-100 pt-2';
+            btnBuatAkunBaru.innerHTML = '➕ Buat Buku/Akun Baru';
+            btnBuatAkunBaru.onclick = () => tambahBukuKasBaru();
+            daftarPilihanAkunEl.appendChild(btnBuatAkunBaru);
+
+            // Filter transaksi berdasarkan akun aktif
+            let transaksiAkunIni = seluruhTransaksi.filter(item => (item.Akun || "Pencatatan Piutang Toko") === akunAktif);
+            
+            let totalPiutang = 0, totalHutang = 0;
+            transaksiAkunIni.forEach(item => {
+                let jml = Number(item.Jumlah);
+                if (item.Kategori === 'Piutang') totalPiutang += jml;
+                else if (item.Kategori === 'Hutang') totalHutang += jml;
+            });
+
+            document.getElementById('valTotalPiutangSaja').innerText = `Rp ${totalPiutang.toLocaleString('id-ID')}`;
+            document.getElementById('valTotalHutangSaja').innerText = `Rp ${totalHutang.toLocaleString('id-ID')}`;
+
+            // Render Filter
+            const filterContainer = document.getElementById('filterContainer');
+            filterContainer.innerHTML = `
+                <button type="button" onclick="setFilter('Semua')" id="fSemua" class="font-medium py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 shadow-sm shrink-0"><span>📋</span> <span>Semua</span></button>
+                <button type="button" onclick="setFilter('Piutang')" id="fPiutang" class="font-medium py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 shadow-sm shrink-0"><span>📗</span> <span>Piutang</span></button>
+                <button type="button" onclick="setFilter('Hutang')" id="fHutang" class="font-medium py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 shadow-sm shrink-0"><span>📕</span> <span>Hutang</span></button>
+            `;
+
+            let btnSemua = document.getElementById('fSemua');
+            if (statusFilter === 'Semua') {
+                btnSemua.className = "font-bold py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-slate-900 bg-slate-900 text-white shadow-sm shrink-0";
+            } else {
+                btnSemua.className = "font-medium py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-slate-300 bg-white text-slate-700 shadow-sm shrink-0";
+            }
+
+            ['Piutang', 'Hutang'].forEach((f, idx) => {
+                let btn = document.getElementById(`f${f}`);
+                let isActive = (statusFilter === f);
+                if (idx === 0) {
+                    btn.className = isActive ? "font-bold py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-emerald-600 bg-emerald-600 text-white shadow-sm shrink-0" : "font-medium py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-emerald-600 bg-white text-emerald-700 shadow-sm shrink-0";
+                } else {
+                    btn.className = isActive ? "font-bold py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-rose-600 bg-rose-600 text-white shadow-sm shrink-0" : "font-medium py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-rose-600 bg-white text-rose-700 shadow-sm shrink-0";
+                }
+            });
+
+            let transaksiDitampilkan = transaksiAkunIni.filter(item => {
+                if (statusFilter !== 'Semua' && item.Kategori !== statusFilter) return false;
+                return true;
+            });
+
+            const tabelData = document.getElementById('tabelData');
+            tabelData.innerHTML = '';
+
+            if (transaksiDitampilkan.length === 0) {
+                tabelData.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400 italic">Belum ada data transaksi di akun ini.</td></tr>`;
+                return;
+            }
+
+            transaksiDitampilkan.forEach(item => {
+                let badgeColor = item.Kategori === 'Piutang' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800';
+                let tanggalFormatted = item.Tanggal ? new Date(item.Tanggal).toISOString().split('T')[0] : '-';
+                let linkWA = `<a href="https://wa.me/?text=${encodeURIComponent(`Halo ${item.Nama}, sekadar mengingatkan terkait catatan ${item.Kategori.toLowerCase()} sebesar Rp${Number(item.Jumlah).toLocaleString('id-ID')}. Terima kasih.`)}" target="_blank" class="inline-block bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 rounded text-xs transition" title="Kirim Tagihan WA">WA</a>`;
+
+                tabelData.innerHTML += `
+                    <tr class="bg-white hover:bg-slate-50 transition-colors">
+                        <td class="p-3 text-slate-700 text-xs">${tanggalFormatted}</td>
+                        <td class="p-3 font-medium text-slate-900">${item.Nama}</td>
+                        <td class="p-3"><span class="px-2 py-1 rounded-full text-xs font-semibold ${badgeColor}">${item.Kategori}</span></td>
+                        <td class="p-3 font-semibold">Rp ${Number(item.Jumlah).toLocaleString('id-ID')}</td>
+                        <td class="p-3 text-slate-600 text-xs">${item.Keterangan || '-'}</td>
+                        <td class="p-3 text-center space-x-1 whitespace-nowrap">
+                            ${linkWA}
+                            <button type="button" onclick="hapusDataOnline('${item.ID}')" class="bg-slate-200 hover:bg-rose-600 hover:text-white text-slate-700 px-2 py-1 rounded text-xs transition cursor-pointer" title="Hapus">Hapus</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function simpanTransaksiOnline(e, kategori) {
+            e.preventDefault();
+            let rawJumlah, tanggal, nama, keterangan, btnSubmit;
+
+            if (kategori === 'Piutang') {
+                rawJumlah = document.getElementById('jumlahPiutang').value.replace(/[^0-9]/g, '');
+                tanggal = document.getElementById('tanggalPiutang').value;
+                nama = document.getElementById('namaPiutang').value;
+                keterangan = document.getElementById('keteranganPiutang').value;
+                btnSubmit = document.getElementById('btnSubmitPiutang');
+            } else {
+                rawJumlah = document.getElementById('jumlahHutang').value.replace(/[^0-9]/g, '');
+                tanggal = document.getElementById('tanggalHutang').value;
+                nama = document.getElementById('namaHutang').value;
+                keterangan = document.getElementById('keteranganHutang').value;
+                btnSubmit = document.getElementById('btnSubmitHutang');
+            }
+
+            btnSubmit.innerText = "Menyimpan ke Cloud...";
+            btnSubmit.disabled = true;
+
+            const payload = {
+                action: 'tambah',
+                id: 'TRX-' + Date.now(),
+                tanggal: tanggal,
+                nama: nama,
+                kategori: kategori,
+                jumlah: rawJumlah,
+                keterangan: keterangan,
+                akun: akunAktif
+            };
+
+            fetch(WEB_APP_URL, {
+                method: 'POST',
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.json())
+            .then(res => {
+                btnSubmit.innerText = kategori === 'Piutang' ? "Simpan Piutang" : "Simpan Hutang";
+                btnSubmit.disabled = false;
+                if (kategori === 'Piutang') document.getElementById('formPiutang').reset();
+                else document.getElementById('formHutang').reset();
+                tutupForm();
+                muatDataDariServer();
+            })
+            .catch(err => {
+                alert("Gagal menyimpan ke server!");
+                btnSubmit.innerText = kategori === 'Piutang' ? "Simpan Piutang" : "Simpan Hutang";
+                btnSubmit.disabled = false;
+            });
+        }
+
+        function hapusDataOnline(idTrx) {
+            if(!confirm('Apakah Anda yakin ingin menghapus data ini secara permanen dari Cloud?')) return;
+
+            const tabelBody = document.getElementById('tabelData');
+            tabelBody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-rose-600 font-medium italic">Menghapus data...</td></tr>`;
+
+            const payload = {
+                action: 'hapus',
+                id: idTrx
+            };
+
+            fetch(WEB_APP_URL, {
+                method: 'POST',
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.json())
+            .then(res => {
+                muatDataDariServer();
+            })
+            .catch(err => {
+                alert("Gagal menghapus data!");
+                muatDataDariServer();
+            });
+        }
+
+        function toggleMenuAksiAkun(event) {
+            event.stopPropagation();
+            const menuAksi = document.getElementById('menuAksiAkun');
+            const btnMenuAkun = document.getElementById('btnMenuAkun');
+
+            if (menuAksi.classList.contains('hidden')) {
+                document.getElementById('subMenuGantiAkun').classList.add('hidden');
+                menuAksi.classList.remove('hidden');
+                btnMenuAkun.className = "bg-white text-slate-900 p-2.5 rounded-t-lg rounded-b-none text-sm transition cursor-pointer flex items-center justify-center border-2 border-slate-200 border-b-0 shadow-none z-50 relative";
+            } else {
+                tutupMenuAksi();
+            }
+        }
+
+        function toggleSubMenuAkun(event) {
+            event.stopPropagation();
+            document.getElementById('subMenuGantiAkun').classList.toggle('hidden');
+        }
+
+        function tutupMenuAksi() {
+            const menuAksi = document.getElementById('menuAksiAkun');
+            const btnMenuAkun = document.getElementById('btnMenuAkun');
+            if (menuAksi && !menuAksi.classList.contains('hidden')) {
+                menuAksi.classList.add('hidden');
+                document.getElementById('subMenuGantiAkun').classList.add('hidden');
+                btnMenuAkun.className = "bg-slate-900 hover:bg-black text-white p-2.5 rounded-lg text-sm transition cursor-pointer flex items-center justify-center border border-white/20 shadow-sm";
+            }
+        }
+
+        window.addEventListener('click', function() {
+            tutupMenuAksi();
+        });
+
+        function gantiAkun(namaAkunBaru) {
+            akunAktif = namaAkunBaru;
+            localStorage.setItem('akun_aktif_piutang_ online', akunAktif);
+            statusFilter = 'Semua';
+            renderApp();
+        }
+
+        function tambahBukuKasBaru() {
+            tutupMenuAksi();
+            let namaBaru = prompt("Masukkan nama Akun / Buku Piutang baru:");
+            if (!namaBaru || namaBaru.trim() === "") return;
+            namaBaru = namaBaru.trim();
+            gantiAkun(namaBaru);
+        }
+
+        function editNamaAkun() {
+            let namaBaru = prompt("Ubah nama Akun:", akunAktif);
+            if (namaBaru === null) return;
+            namaBaru = namaBaru.trim();
+            if (namaBaru === "") {
+                alert("Nama akun tidak boleh kosong!");
+                return;
+            }
+            if (namaBaru === akunAktif) return;
+            
+            // Mengubah nama akun pada data lokal memori lalu refresh
+            seluruhTransaksi.forEach(item => {
+                if ((item.Akun || "Pencatatan Piutang Toko") === akunAktif) {
+                    item.Akun = namaBaru;
+                }
+            });
+            akunAktif = namaBaru;
+            localStorage.setItem('akun_aktif_piutang_ online', akunAktif);
+            renderApp();
+            alert("Nama akun berhasil diubah di tampilan ini. Data baru berikutnya akan menggunakan nama baru ini.");
+        }
+
+        function hapusAkunAktif() {
+            tutupMenuAksi();
+            if (confirm(`Apakah Anda yakin ingin mengganti/membersihkan pandangan akun "${akunAktif}"?`)) {
+                akunAktif = "Pencatatan Piutang Toko";
+                renderApp();
+            }
+        }
+
+        // Muat data pertama kali saat halaman dibuka
+        muatDataDariServer();
+    </script>
+</body>
+</html>
