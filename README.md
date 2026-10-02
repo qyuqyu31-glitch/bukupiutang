@@ -1,0 +1,2 @@
+# bukupiutang
+mencatat hutang piutang
