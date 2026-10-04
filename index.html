@@ -60,15 +60,15 @@
 
         </header>
 
-        <!-- KARTU RINGKASAN KEUANGAN -->
+        <!-- KARTU RINGKASAN KEUANGAN (Piutang: Merah, Hutang: Biru) -->
         <div id="wrapperRingkasan" class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
-            <div class="bg-emerald-50 border border-emerald-200 p-3.5 rounded-xl shadow-sm">
-                <p class="text-[11px] uppercase tracking-wider text-emerald-600 font-semibold">Total Piutang Aktif</p>
-                <p id="valTotalPiutangSaja" class="text-xl font-bold text-emerald-700 mt-1">Rp 0</p>
-            </div>
             <div class="bg-rose-50 border border-rose-200 p-3.5 rounded-xl shadow-sm">
-                <p class="text-[11px] uppercase tracking-wider text-rose-600 font-semibold">Total Hutang Aktif</p>
-                <p id="valTotalHutangSaja" class="text-xl font-bold text-rose-700 mt-1">Rp 0</p>
+                <p class="text-[11px] uppercase tracking-wider text-rose-600 font-semibold">Total Piutang Aktif</p>
+                <p id="valTotalPiutangSaja" class="text-xl font-bold text-rose-700 mt-1">Rp 0</p>
+            </div>
+            <div class="bg-blue-50 border border-blue-200 p-3.5 rounded-xl shadow-sm">
+                <p class="text-[11px] uppercase tracking-wider text-blue-600 font-semibold">Total Hutang Aktif</p>
+                <p id="valTotalHutangSaja" class="text-xl font-bold text-blue-700 mt-1">Rp 0</p>
             </div>
         </div>
 
@@ -181,11 +181,12 @@
                             <th class="p-3">Kategori</th>
                             <th class="p-3">Jumlah</th>
                             <th class="p-3">Keterangan</th>
+                            <th class="p-3">Status</th>
                             <th class="p-3 text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody id="tabelData" class="divide-y divide-slate-200">
-                        <tr><td colspan="6" class="p-4 text-center text-slate-400 italic">Memuat data dari server...</td></tr>
+                        <tr><td colspan="7" class="p-4 text-center text-slate-400 italic">Memuat data dari server...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -195,7 +196,7 @@
 
     <!-- Skrip JavaScript Online -->
     <script>
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzyLaoG6eWLLYjLFWq1gIEQNwD-3_EdZ8JRlsFmJLQBM44lXO8czNWCj69uvmpEyVf7eg/exec";
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwynVE9JQ1s4TeBBwiv_LRVKGoQLRvVrxviLqk-LXg8rQWv8wfvu9uKEtPY-L67yzf5xQ/exec";
         
         let seluruhTransaksi = [];
         let akunAktif = localStorage.getItem('akun_aktif_piutang_ online') || "Pencatatan Piutang Toko";
@@ -239,10 +240,9 @@
             renderApp();
         }
 
-        // Ambil Data dari Google Sheets
         function muatDataDariServer() {
             const tabelBody = document.getElementById('tabelData');
-            tabelBody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-blue-600 font-medium italic">Menghubungkan ke server...</td></tr>`;
+            tabelBody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-blue-600 font-medium italic">Menghubungkan ke server...</td></tr>`;
 
             fetch(WEB_APP_URL)
                 .then(response => response.json())
@@ -252,7 +252,7 @@
                 })
                 .catch(error => {
                     console.error('Gagal memuat:', error);
-                    tabelBody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-rose-600 font-medium">Gagal memuat data. Cek koneksi internet Anda.</td></tr>`;
+                    tabelBody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-rose-600 font-medium">Gagal memuat data. Cek koneksi internet Anda.</td></tr>`;
                 });
         }
 
@@ -300,7 +300,6 @@
             document.getElementById('valTotalPiutangSaja').innerText = `Rp ${totalPiutang.toLocaleString('id-ID')}`;
             document.getElementById('valTotalHutangSaja').innerText = `Rp ${totalHutang.toLocaleString('id-ID')}`;
 
-            // Render Tombol Filter (Semua, Piutang, Hutang, Lunas)
             const filterContainer = document.getElementById('filterContainer');
             filterContainer.innerHTML = `
                 <button type="button" onclick="setFilter('Semua')" id="fSemua" class="font-medium py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 shadow-sm shrink-0"><span>📋</span> <span>Semua</span></button>
@@ -309,7 +308,6 @@
                 <button type="button" onclick="setFilter('Lunas')" id="fLunas" class="font-medium py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 shadow-sm shrink-0"><span>✨</span> <span>Lunas</span></button>
             `;
 
-            // Styling Tombol Filter Aktif / Tidak Aktif
             let btnSemua = document.getElementById('fSemua');
             if (statusFilter === 'Semua') {
                 btnSemua.className = "font-bold py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-slate-900 bg-slate-900 text-white shadow-sm shrink-0";
@@ -317,7 +315,6 @@
                 btnSemua.className = "font-medium py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-slate-300 bg-white text-slate-700 shadow-sm shrink-0";
             }
 
-            // Filter Piutang
             let btnPiutang = document.getElementById('fPiutang');
             if (statusFilter === 'Piutang') {
                 btnPiutang.className = "font-bold py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-emerald-600 bg-emerald-600 text-white shadow-sm shrink-0";
@@ -325,7 +322,6 @@
                 btnPiutang.className = "font-medium py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-emerald-600 bg-white text-emerald-700 shadow-sm shrink-0";
             }
 
-            // Filter Hutang
             let btnHutang = document.getElementById('fHutang');
             if (statusFilter === 'Hutang') {
                 btnHutang.className = "font-bold py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-rose-600 bg-rose-600 text-white shadow-sm shrink-0";
@@ -333,7 +329,6 @@
                 btnHutang.className = "font-medium py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-rose-600 bg-white text-rose-700 shadow-sm shrink-0";
             }
 
-            // Filter Lunas (Warna Biru)
             let btnLunas = document.getElementById('fLunas');
             if (statusFilter === 'Lunas') {
                 btnLunas.className = "font-bold py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-blue-600 bg-blue-600 text-white shadow-sm shrink-0";
@@ -349,48 +344,53 @@
                 return true;
             });
 
-            // Urutkan agar transaksi terbaru berada di paling atas
             transaksiDitampilkan.reverse();
 
             const tabelData = document.getElementById('tabelData');
             tabelData.innerHTML = '';
 
             if (transaksiDitampilkan.length === 0) {
-                tabelData.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400 italic">Belum ada data transaksi di kategori ini.</td></tr>`;
+                tabelData.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-400 italic">Belum ada data transaksi di kategori ini.</td></tr>`;
                 return;
             }
 
             transaksiDitampilkan.forEach(item => {
                 let bgRowClass = "bg-white";
-                let badgeColor = "bg-slate-100 text-slate-800";
+                let teksKategori = "";
+                let teksStatus = "";
                 let tombolLunasHTML = "";
 
                 if (item.Kategori === 'Piutang') {
-                    bgRowClass = "bg-emerald-50/70 hover:bg-emerald-100/70";
-                    badgeColor = "bg-emerald-200 text-emerald-900";
-                    tombolLunasHTML = `<button type="button" onclick="bukaModalPelunasan('${item.ID}')" class="bg-blue-100 hover:bg-blue-600 hover:text-white text-blue-700 px-2 py-1 rounded text-xs transition cursor-pointer font-medium" title="Tandai Lunas">Lunas</button>`;
+                    bgRowClass = "bg-rose-200 hover:bg-rose-300"; // Fill Background Merah Pekat
+                    teksKategori = "Piutang";
+                    teksStatus = '<span class="px-2 py-0.5 rounded text-xs font-bold bg-rose-700 text-white">Belum Lunas</span>';
+                    tombolLunasHTML = `<button type="button" onclick="bukaModalPelunasan('${item.ID}')" class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs transition cursor-pointer font-medium" title="Tandai Lunas">Lunas</button>`;
                 } else if (item.Kategori === 'Hutang') {
-                    bgRowClass = "bg-rose-50/70 hover:bg-rose-100/70";
-                    badgeColor = "bg-rose-200 text-rose-900";
-                    tombolLunasHTML = `<button type="button" onclick="bukaModalPelunasan('${item.ID}')" class="bg-blue-100 hover:bg-blue-600 hover:text-white text-blue-700 px-2 py-1 rounded text-xs transition cursor-pointer font-medium" title="Tandai Lunas">Lunas</button>`;
+                    bgRowClass = "bg-blue-200 hover:bg-blue-300"; // Fill Background Biru Pekat
+                    teksKategori = "Hutang";
+                    teksStatus = '<span class="px-2 py-0.5 rounded text-xs font-bold bg-blue-700 text-white">Belum Lunas</span>';
+                    tombolLunasHTML = `<button type="button" onclick="bukaModalPelunasan('${item.ID}')" class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs transition cursor-pointer font-medium" title="Tandai Lunas">Lunas</button>`;
                 } else if (item.Kategori === 'Piutang Lunas') {
-                    bgRowClass = "bg-white hover:bg-slate-50";
-                    badgeColor = "bg-blue-100 text-blue-800";
+                    bgRowClass = "bg-emerald-200 hover:bg-emerald-300"; // Fill Background Hijau
+                    teksKategori = "Piutang";
+                    teksStatus = '<span class="px-2 py-0.5 rounded text-xs font-bold bg-emerald-700 text-white">Lunas</span>';
                 } else if (item.Kategori === 'Hutang Lunas') {
-                    bgRowClass = "bg-white hover:bg-slate-50";
-                    badgeColor = "bg-blue-100 text-blue-800";
+                    bgRowClass = "bg-emerald-200 hover:bg-emerald-300"; // Fill Background Hijau
+                    teksKategori = "Hutang";
+                    teksStatus = '<span class="px-2 py-0.5 rounded text-xs font-bold bg-emerald-700 text-white">Lunas</span>';
                 }
 
                 let tanggalFormatted = item.Tanggal ? new Date(item.Tanggal).toISOString().split('T')[0] : '-';
-                let linkWA = `<a href="https://wa.me/?text=${encodeURIComponent(`Halo ${item.Nama}, sekadar mengingatkan terkait catatan ${item.Kategori.toLowerCase()} sebesar Rp${Number(item.Jumlah).toLocaleString('id-ID')}. Terima kasih.`)}" target="_blank" class="inline-block bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 rounded text-xs transition" title="Kirim Tagihan WA">WA</a>`;
+                let linkWA = `<a href="https://wa.me/?text=${encodeURIComponent(`Halo ${item.Nama}, sekadar mengingatkan terkait catatan ${teksKategori.toLowerCase()} sebesar Rp${Number(item.Jumlah).toLocaleString('id-ID')}. Terima kasih.`)}" target="_blank" class="inline-block bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 rounded text-xs transition" title="Kirim Tagihan WA">WA</a>`;
 
                 tabelData.innerHTML += `
                     <tr class="${bgRowClass} transition-colors">
-                        <td class="p-3 text-slate-700 text-xs">${tanggalFormatted}</td>
-                        <td class="p-3 font-medium text-slate-900">${item.Nama}</td>
-                        <td class="p-3"><span class="px-2 py-1 rounded-full text-xs font-semibold ${badgeColor}">${item.Kategori}</span></td>
-                        <td class="p-3 font-semibold">Rp ${Number(item.Jumlah).toLocaleString('id-ID')}</td>
-                        <td class="p-3 text-slate-600 text-xs">${item.Keterangan || '-'}</td>
+                        <td class="p-3 text-slate-800 text-xs font-medium">${tanggalFormatted}</td>
+                        <td class="p-3 font-bold text-slate-900">${item.Nama}</td>
+                        <td class="p-3 font-semibold text-slate-800">${teksKategori}</td>
+                        <td class="p-3 font-bold text-slate-900">Rp ${Number(item.Jumlah).toLocaleString('id-ID')}</td>
+                        <td class="p-3 text-slate-800 text-xs font-medium">${item.Keterangan || '-'}</td>
+                        <td class="p-3">${teksStatus}</td>
                         <td class="p-3 text-center space-x-1 whitespace-nowrap">
                             ${linkWA}
                             ${tombolLunasHTML}
@@ -431,10 +431,10 @@
             let kategoriBaru = targetTrx.Kategori === 'Piutang' ? 'Piutang Lunas' : 'Hutang Lunas';
 
             const tabelBody = document.getElementById('tabelData');
-            tabelBody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-blue-600 font-medium italic">Memproses pelunasan...</td></tr>`;
+            tabelBody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-blue-600 font-medium italic">Memproses pelunasan...</td></tr>`;
 
             const payload = {
-                action: 'editKategori', // Aksi khusus untuk mengubah kategori di Google Sheets
+                action: 'editKategori',
                 id: idTrxDipilihUntukLunas,
                 kategoriBaru: kategoriBaru,
                 tanggalPelunasan: tglLunas
@@ -511,7 +511,7 @@
             if(!confirm('Apakah Anda yakin ingin menghapus data ini secara permanen dari Cloud?')) return;
 
             const tabelBody = document.getElementById('tabelData');
-            tabelBody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-rose-600 font-medium italic">Menghapus data...</td></tr>`;
+            tabelBody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-rose-600 font-medium italic">Menghapus data...</td></tr>`;
 
             const payload = {
                 action: 'hapus',
@@ -609,7 +609,6 @@
             }
         }
 
-        // Muat data pertama kali saat halaman dibuka
         muatDataDariServer();
     </script>
 </body>
