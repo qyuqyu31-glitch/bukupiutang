@@ -300,13 +300,16 @@
             document.getElementById('valTotalPiutangSaja').innerText = `Rp ${totalPiutang.toLocaleString('id-ID')}`;
             document.getElementById('valTotalHutangSaja').innerText = `Rp ${totalHutang.toLocaleString('id-ID')}`;
 
+            // Render Tombol Filter (Semua, Piutang, Hutang, Lunas)
             const filterContainer = document.getElementById('filterContainer');
             filterContainer.innerHTML = `
                 <button type="button" onclick="setFilter('Semua')" id="fSemua" class="font-medium py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 shadow-sm shrink-0"><span>📋</span> <span>Semua</span></button>
                 <button type="button" onclick="setFilter('Piutang')" id="fPiutang" class="font-medium py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 shadow-sm shrink-0"><span>📗</span> <span>Piutang</span></button>
                 <button type="button" onclick="setFilter('Hutang')" id="fHutang" class="font-medium py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 shadow-sm shrink-0"><span>📕</span> <span>Hutang</span></button>
+                <button type="button" onclick="setFilter('Lunas')" id="fLunas" class="font-medium py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 shadow-sm shrink-0"><span>✨</span> <span>Lunas</span></button>
             `;
 
+            // Styling Tombol Filter Aktif / Tidak Aktif
             let btnSemua = document.getElementById('fSemua');
             if (statusFilter === 'Semua') {
                 btnSemua.className = "font-bold py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-slate-900 bg-slate-900 text-white shadow-sm shrink-0";
@@ -314,18 +317,35 @@
                 btnSemua.className = "font-medium py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-slate-300 bg-white text-slate-700 shadow-sm shrink-0";
             }
 
-            ['Piutang', 'Hutang'].forEach((f, idx) => {
-                let btn = document.getElementById(`f${f}`);
-                let isActive = (statusFilter === f);
-                if (idx === 0) {
-                    btn.className = isActive ? "font-bold py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-emerald-600 bg-emerald-600 text-white shadow-sm shrink-0" : "font-medium py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-emerald-600 bg-white text-emerald-700 shadow-sm shrink-0";
-                } else {
-                    btn.className = isActive ? "font-bold py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-rose-600 bg-rose-600 text-white shadow-sm shrink-0" : "font-medium py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-rose-600 bg-white text-rose-700 shadow-sm shrink-0";
-                }
-            });
+            // Filter Piutang
+            let btnPiutang = document.getElementById('fPiutang');
+            if (statusFilter === 'Piutang') {
+                btnPiutang.className = "font-bold py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-emerald-600 bg-emerald-600 text-white shadow-sm shrink-0";
+            } else {
+                btnPiutang.className = "font-medium py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-emerald-600 bg-white text-emerald-700 shadow-sm shrink-0";
+            }
+
+            // Filter Hutang
+            let btnHutang = document.getElementById('fHutang');
+            if (statusFilter === 'Hutang') {
+                btnHutang.className = "font-bold py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-rose-600 bg-rose-600 text-white shadow-sm shrink-0";
+            } else {
+                btnHutang.className = "font-medium py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-rose-600 bg-white text-rose-700 shadow-sm shrink-0";
+            }
+
+            // Filter Lunas (Warna Biru)
+            let btnLunas = document.getElementById('fLunas');
+            if (statusFilter === 'Lunas') {
+                btnLunas.className = "font-bold py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-blue-600 bg-blue-600 text-white shadow-sm shrink-0";
+            } else {
+                btnLunas.className = "font-medium py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-blue-600 bg-white text-blue-700 shadow-sm shrink-0";
+            }
 
             let transaksiDitampilkan = transaksiAkunIni.filter(item => {
-                if (statusFilter !== 'Semua' && item.Kategori !== statusFilter) return false;
+                if (statusFilter === 'Semua') return true;
+                if (statusFilter === 'Piutang') return item.Kategori === 'Piutang';
+                if (statusFilter === 'Hutang') return item.Kategori === 'Hutang';
+                if (statusFilter === 'Lunas') return item.Kategori === 'Piutang Lunas' || item.Kategori === 'Hutang Lunas';
                 return true;
             });
 
@@ -336,17 +356,36 @@
             tabelData.innerHTML = '';
 
             if (transaksiDitampilkan.length === 0) {
-                tabelData.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400 italic">Belum ada data transaksi di akun ini.</td></tr>`;
+                tabelData.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400 italic">Belum ada data transaksi di kategori ini.</td></tr>`;
                 return;
             }
 
             transaksiDitampilkan.forEach(item => {
-                let badgeColor = item.Kategori === 'Piutang' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800';
+                let bgRowClass = "bg-white";
+                let badgeColor = "bg-slate-100 text-slate-800";
+                let tombolLunasHTML = "";
+
+                if (item.Kategori === 'Piutang') {
+                    bgRowClass = "bg-emerald-50/70 hover:bg-emerald-100/70";
+                    badgeColor = "bg-emerald-200 text-emerald-900";
+                    tombolLunasHTML = `<button type="button" onclick="bukaModalPelunasan('${item.ID}')" class="bg-blue-100 hover:bg-blue-600 hover:text-white text-blue-700 px-2 py-1 rounded text-xs transition cursor-pointer font-medium" title="Tandai Lunas">Lunas</button>`;
+                } else if (item.Kategori === 'Hutang') {
+                    bgRowClass = "bg-rose-50/70 hover:bg-rose-100/70";
+                    badgeColor = "bg-rose-200 text-rose-900";
+                    tombolLunasHTML = `<button type="button" onclick="bukaModalPelunasan('${item.ID}')" class="bg-blue-100 hover:bg-blue-600 hover:text-white text-blue-700 px-2 py-1 rounded text-xs transition cursor-pointer font-medium" title="Tandai Lunas">Lunas</button>`;
+                } else if (item.Kategori === 'Piutang Lunas') {
+                    bgRowClass = "bg-white hover:bg-slate-50";
+                    badgeColor = "bg-blue-100 text-blue-800";
+                } else if (item.Kategori === 'Hutang Lunas') {
+                    bgRowClass = "bg-white hover:bg-slate-50";
+                    badgeColor = "bg-blue-100 text-blue-800";
+                }
+
                 let tanggalFormatted = item.Tanggal ? new Date(item.Tanggal).toISOString().split('T')[0] : '-';
                 let linkWA = `<a href="https://wa.me/?text=${encodeURIComponent(`Halo ${item.Nama}, sekadar mengingatkan terkait catatan ${item.Kategori.toLowerCase()} sebesar Rp${Number(item.Jumlah).toLocaleString('id-ID')}. Terima kasih.`)}" target="_blank" class="inline-block bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 rounded text-xs transition" title="Kirim Tagihan WA">WA</a>`;
 
                 tabelData.innerHTML += `
-                    <tr class="bg-white hover:bg-slate-50 transition-colors">
+                    <tr class="${bgRowClass} transition-colors">
                         <td class="p-3 text-slate-700 text-xs">${tanggalFormatted}</td>
                         <td class="p-3 font-medium text-slate-900">${item.Nama}</td>
                         <td class="p-3"><span class="px-2 py-1 rounded-full text-xs font-semibold ${badgeColor}">${item.Kategori}</span></td>
@@ -354,7 +393,7 @@
                         <td class="p-3 text-slate-600 text-xs">${item.Keterangan || '-'}</td>
                         <td class="p-3 text-center space-x-1 whitespace-nowrap">
                             ${linkWA}
-                            <button type="button" onclick="bukaModalPelunasan('${item.ID}')" class="bg-blue-100 hover:bg-blue-600 hover:text-white text-blue-700 px-2 py-1 rounded text-xs transition cursor-pointer font-medium" title="Tandai Lunas">Lunas</button>
+                            ${tombolLunasHTML}
                             <button type="button" onclick="hapusDataOnline('${item.ID}')" class="bg-slate-200 hover:bg-rose-600 hover:text-white text-slate-700 px-2 py-1 rounded text-xs transition cursor-pointer" title="Hapus">Hapus</button>
                         </td>
                     </tr>
@@ -383,12 +422,22 @@
                 tglLunas = new Date().toISOString().split('T')[0];
             }
 
+            let targetTrx = seluruhTransaksi.find(item => item.ID === idTrxDipilihUntukLunas);
+            if (!targetTrx) {
+                tutupModalPelunasan();
+                return;
+            }
+
+            let kategoriBaru = targetTrx.Kategori === 'Piutang' ? 'Piutang Lunas' : 'Hutang Lunas';
+
             const tabelBody = document.getElementById('tabelData');
             tabelBody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-blue-600 font-medium italic">Memproses pelunasan...</td></tr>`;
 
             const payload = {
-                action: 'hapus', // Menggunakan aksi hapus baris dari spreadsheet
-                id: idTrxDipilihUntukLunas
+                action: 'editKategori', // Aksi khusus untuk mengubah kategori di Google Sheets
+                id: idTrxDipilihUntukLunas,
+                kategoriBaru: kategoriBaru,
+                tanggalPelunasan: tglLunas
             };
 
             fetch(WEB_APP_URL, {
