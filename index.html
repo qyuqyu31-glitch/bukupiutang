@@ -143,11 +143,11 @@
         </div>
 
         <!-- MODAL / KARTU INFORMASI LENGKAP DETAIL TRANSAKSI -->
-        <div id="modalDetail" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-            <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200">
-                <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
+        <div id="modalDetail" onclick="tutupModalDetail(event)" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <div id="kotakKontenDetail" onclick="event.stopPropagation()" class="rounded-2xl max-w-md w-full p-6 shadow-2xl border transition-all">
+                <div class="flex justify-between items-center mb-4 pb-2 border-b border-black/10">
                     <h3 class="text-base font-bold text-slate-900">📋 Detail Transaksi</h3>
-                    <button type="button" onclick="tutupModalDetail()" class="text-slate-400 hover:text-slate-700 font-bold text-sm px-2 py-1 cursor-pointer">✕</button>
+                    <button type="button" onclick="tutupModalDetailManual()" class="text-slate-600 hover:text-slate-900 font-bold text-base px-2 py-1 cursor-pointer">✕</button>
                 </div>
                 <div id="kontenDetailTransaksi" class="space-y-3 text-sm mb-6">
                     <!-- Diisi lewat JS -->
@@ -221,7 +221,7 @@
 
     <!-- Skrip JavaScript Online -->
     <script>
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxkLSFSBRzKDvDg6r0zLZbcbTAb0kVgTg_FCu-b3UN2QnSDWVfbzJcfkUiEM24oopcr9w/exec";
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwynVE9JQ1s4TeBBwiv_LRVKGoQLRvVrxviLqk-LXg8rQWv8wfvu9uKEtPY-L67yzf5xQ/exec";
         
         let seluruhTransaksi = [];
         let akunAktif = localStorage.getItem('akun_aktif_piutang_ online') || "Pencatatan Piutang Toko";
@@ -343,7 +343,6 @@
                 btnSemua.className = "font-medium py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-slate-300 bg-white text-slate-700 shadow-sm shrink-0";
             }
 
-            // Tombol filter piutang warna merah jika aktif
             let btnPiutang = document.getElementById('fPiutang');
             if (statusFilter === 'Piutang') {
                 btnPiutang.className = "font-bold py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-rose-600 bg-rose-600 text-white shadow-sm shrink-0";
@@ -351,7 +350,6 @@
                 btnPiutang.className = "font-medium py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-rose-600 bg-white text-rose-700 shadow-sm shrink-0";
             }
 
-            // Tombol filter hutang warna biru jika aktif
             let btnHutang = document.getElementById('fHutang');
             if (statusFilter === 'Hutang') {
                 btnHutang.className = "font-bold py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-blue-600 bg-blue-600 text-white shadow-sm shrink-0";
@@ -359,7 +357,6 @@
                 btnHutang.className = "font-medium py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-blue-600 bg-white text-blue-700 shadow-sm shrink-0";
             }
 
-            // Tombol filter lunas warna hijau jika aktif
             let btnLunas = document.getElementById('fLunas');
             if (statusFilter === 'Lunas') {
                 btnLunas.className = "font-bold py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-emerald-600 bg-emerald-600 text-white shadow-sm shrink-0";
@@ -391,15 +388,15 @@
                 let teksStatus = "";
 
                 if (item.Kategori === 'Piutang') {
-                    bgRowClass = "bg-rose-200 hover:bg-rose-300"; // Merah pekat
+                    bgRowClass = "bg-rose-200 active:bg-rose-300 hover:bg-rose-300";
                     teksKategori = "Piutang";
                     teksStatus = '<span class="px-2 py-0.5 rounded text-xs font-bold bg-rose-700 text-white">Belum Lunas</span>';
                 } else if (item.Kategori === 'Hutang') {
-                    bgRowClass = "bg-blue-200 hover:bg-blue-300"; // Biru pekat
+                    bgRowClass = "bg-blue-200 active:bg-blue-300 hover:bg-blue-300";
                     teksKategori = "Hutang";
                     teksStatus = '<span class="px-2 py-0.5 rounded text-xs font-bold bg-blue-700 text-white">Belum Lunas</span>';
                 } else if (item.Kategori === 'Piutang Lunas' || item.Kategori === 'Hutang Lunas') {
-                    bgRowClass = "bg-emerald-200 hover:bg-emerald-300"; // Hijau pekat
+                    bgRowClass = "bg-emerald-200 active:bg-emerald-300 hover:bg-emerald-300";
                     teksKategori = item.Kategori.replace(' Lunas', '');
                     teksStatus = '<span class="px-2 py-0.5 rounded text-xs font-bold bg-emerald-700 text-white">Lunas</span>';
                 }
@@ -412,7 +409,6 @@
                 tr.className = `${bgRowClass} transition-colors cursor-pointer`;
                 tr.dataset.id = item.ID;
 
-                // Event listener untuk klik biasa dan long-press (tekan & tahan)
                 tr.onclick = (e) => {
                     if (e.target.type === 'checkbox') return;
                     bukaDetailTransaksi(item.ID);
@@ -445,7 +441,7 @@
             longPressTimer = setTimeout(() => {
                 togglePilihItem(id);
                 renderApp();
-            }, 600); // 0.6 detik tekan & tahan
+            }, 600);
         }
 
         function cancelLongPress() {
@@ -492,37 +488,57 @@
             let isLunas = item.Kategori.includes('Lunas');
             let statusStr = isLunas ? 'Lunas' : 'Belum Lunas';
 
+            // Menentukan warna background kartu detail sesuai kategori
+            let kotakKonten = document.getElementById('kotakKontenDetail');
+            kotakKonten.className = "rounded-2xl max-w-md w-full p-6 shadow-2xl border transition-all ";
+            if (item.Kategori === 'Piutang') {
+                kotakKonten.classList.add('bg-rose-200', 'border-rose-400');
+            } else if (item.Kategori === 'Hutang') {
+                kotakKonten.classList.add('bg-blue-200', 'border-blue-400');
+            } else {
+                kotakKonten.classList.add('bg-emerald-200', 'border-emerald-400');
+            }
+
             let kontentEl = document.getElementById('kontenDetailTransaksi');
             kontentEl.innerHTML = `
-                <div class="flex justify-between border-b border-slate-100 py-1.5"><span class="text-slate-500">Nama Pihak:</span><span class="font-bold text-slate-900">${item.Nama}</span></div>
-                <div class="flex justify-between border-b border-slate-100 py-1.5"><span class="text-slate-500">Tanggal:</span><span class="font-semibold text-slate-800">${tanggalFormatted}</span></div>
-                <div class="flex justify-between border-b border-slate-100 py-1.5"><span class="text-slate-500">Jenis Transaksi:</span><span class="font-semibold text-slate-800">${kategoriAsli}</span></div>
-                <div class="flex justify-between border-b border-slate-100 py-1.5"><span class="text-slate-500">Nominal:</span><span class="font-bold text-slate-900">Rp ${Number(item.Jumlah).toLocaleString('id-ID')}</span></div>
-                <div class="flex justify-between border-b border-slate-100 py-1.5"><span class="text-slate-500">Keterangan:</span><span class="text-slate-800">${item.Keterangan || '-'}</span></div>
-                <div class="flex justify-between border-b border-slate-100 py-1.5"><span class="text-slate-500">Status:</span><span class="font-bold ${isLunas ? 'text-emerald-600' : 'text-rose-600'}">${statusStr}</span></div>
-                <div class="flex justify-between py-1.5"><span class="text-slate-500">Buku / Akun:</span><span class="text-slate-800">${item.Akun || 'Pencatatan Piutang Toko'}</span></div>
+                <div class="flex justify-between border-b border-black/10 py-1.5"><span class="text-slate-700 font-medium">Nama Pihak:</span><span class="font-bold text-slate-900">${item.Nama}</span></div>
+                <div class="flex justify-between border-b border-black/10 py-1.5"><span class="text-slate-700 font-medium">Tanggal:</span><span class="font-semibold text-slate-900">${tanggalFormatted}</span></div>
+                <div class="flex justify-between border-b border-black/10 py-1.5"><span class="text-slate-700 font-medium">Jenis Transaksi:</span><span class="font-semibold text-slate-900">${kategoriAsli}</span></div>
+                <div class="flex justify-between border-b border-black/10 py-1.5"><span class="text-slate-700 font-medium">Nominal:</span><span class="font-bold text-slate-900">Rp ${Number(item.Jumlah).toLocaleString('id-ID')}</span></div>
+                <div class="flex justify-between border-b border-black/10 py-1.5"><span class="text-slate-700 font-medium">Keterangan:</span><span class="text-slate-900 font-medium">${item.Keterangan || '-'}</span></div>
+                <div class="flex justify-between border-b border-black/10 py-1.5"><span class="text-slate-700 font-medium">Status:</span><span class="font-bold ${isLunas ? 'text-emerald-800' : 'text-rose-800'}">${statusStr}</span></div>
+                <div class="flex justify-between py-1.5"><span class="text-slate-700 font-medium">Buku / Akun:</span><span class="text-slate-900 font-medium">${item.Akun || 'Pencatatan Piutang Toko'}</span></div>
             `;
 
             let aksiEl = document.getElementById('aksiDetailTransaksi');
             let tombolLunasDetail = !isLunas ? `<button type="button" onclick="bukaModalPelunasan('${item.ID}')" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-3 rounded-xl text-xs transition cursor-pointer shadow-sm">Tandai Lunas</button>` : '';
             let linkWA = `https://wa.me/?text=${encodeURIComponent(`Halo ${item.Nama}, sekadar mengingatkan terkait catatan ${kategoriAsli.toLowerCase()} sebesar Rp${Number(item.Jumlah).toLocaleString('id-ID')}. Terima kasih.`)}`;
 
+            // Logo SVG WhatsApp yang elegan
+            let logoWA = `<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>`;
+
             aksiEl.innerHTML = `
-                <a href="${linkWA}" target="_blank" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 px-3 rounded-xl text-xs transition cursor-pointer shadow-sm flex items-center gap-1">📱 Kirim WA</a>
+                <a href="${linkWA}" target="_blank" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 px-3 rounded-xl text-xs transition cursor-pointer shadow-sm flex items-center gap-1.5">${logoWA} <span>WhatsApp</span></a>
                 ${tombolLunasDetail}
-                <button type="button" onclick="hapusDataOnline('${item.ID}')" class="bg-rose-100 hover:bg-rose-600 hover:text-white text-rose-700 font-medium py-2 px-3 rounded-xl text-xs transition cursor-pointer">Hapus</button>
+                <button type="button" onclick="hapusDataOnline('${item.ID}')" class="bg-rose-700 hover:bg-rose-800 text-white font-medium py-2 px-3 rounded-xl text-xs transition cursor-pointer shadow-sm">Hapus</button>
             `;
 
             document.getElementById('modalDetail').classList.remove('hidden');
         }
 
-        function tutupModalDetail() {
+        function tutupModalDetail(event) {
+            // Menutup modal jika area backdrop (luar kotak) diklik
+            document.getElementById('modalDetail').classList.add('hidden');
+            idTrxDetailAktif = null;
+        }
+
+        function tutupModalDetailManual() {
             document.getElementById('modalDetail').classList.add('hidden');
             idTrxDetailAktif = null;
         }
 
         function bukaModalPelunasan(idTrx) {
-            tutupModalDetail();
+            document.getElementById('modalDetail').classList.add('hidden');
             idTrxDipilihUntukLunas = idTrx;
             const hariIni = new Date().toISOString().split('T')[0];
             document.getElementById('tanggalPelunasanInput').value = hariIni;
@@ -684,7 +700,7 @@
         }
 
         function hapusDataOnline(idTrx) {
-            tutupModalDetail();
+            document.getElementById('modalDetail').classList.add('hidden');
             if(!confirm('Apakah Anda yakin ingin menghapus data ini secara permanen dari Cloud?')) return;
 
             const payload = {
