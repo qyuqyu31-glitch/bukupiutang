@@ -222,7 +222,7 @@
 
     <!-- Skrip JavaScript Online -->
     <script>
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwpsNBCX1s5b-xpYP58dbCMOvijsgT-9z4ZMZnzcjl0zSUYhQlramwmpi2Nt2_bQDAFnA/exec";
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyx15XSAgXhYxUvIqlK3Tcrifn5HlZouCPgcCHIrWUgJqzXojKHur6ab-y8ocVcADNX5g/exec";
         
         let seluruhTransaksi = [];
         let akunAktif = localStorage.getItem('akun_aktif_piutang_ online') || "Pencatatan Piutang Toko";
@@ -400,7 +400,6 @@
                     teksStatus = '<span class="px-2 py-0.5 rounded text-xs font-bold bg-blue-700 text-white">Belum Lunas</span>';
                     tombolAksiLunas = `<button type="button" onclick="bukaModalPelunasan('${item.ID}')" class="bg-gradient-to-b from-emerald-500 to-emerald-700 hover:from-emerald-400 hover:to-emerald-600 active:from-slate-400 active:to-slate-500 active:translate-y-1 text-white px-3.5 py-1.5 rounded-xl text-xs font-bold shadow-[0_4px_0_0_#047857] active:shadow-none transition-all cursor-pointer">Lunaskan</button>`;
                 } else if (item.Kategori === 'Piutang Lunas' || item.Kategori === 'Hutang Lunas') {
-                    // Baris berubah background menjadi hijau, teks status hijau
                     bgRowClass = "bg-emerald-200 active:bg-emerald-300 hover:bg-emerald-300";
                     teksKategori = item.Kategori.replace(' Lunas', '');
                     teksStatus = '<span class="px-2 py-0.5 rounded text-xs font-bold bg-emerald-700 text-white">Lunas</span>';
@@ -487,7 +486,7 @@
 
         function bukaDetailTransaksi(id) {
             idTrxDetailAktif = id;
-            let item = seluruhTransaksi.find(t => t.ID === id);
+            let item = seluruhTransaksi.find(t => String(t.ID) === String(id));
             if (!item) return;
 
             let tanggalFormatted = item.Tanggal ? new Date(item.Tanggal).toISOString().split('T')[0] : '-';
@@ -575,42 +574,35 @@
 
             if (idTrxDipilihUntukLunas === 'MASSAL') {
                 let daftarId = Array.from(itemTerpilihSet);
-                prosesPelunasanBatch(daftarId, tglLunas);
+                daftarId.forEach(id => {
+                    let targetTrx = seluruhTransaksi.find(item => String(item.ID) === String(id));
+                    if (targetTrx) {
+                        targetTrx.Kategori = targetTrx.Kategori.includes('Piutang') ? 'Piutang Lunas' : 'Hutang Lunas';
+                    }
+                });
+                itemTerpilihSet.clear();
+                renderApp();
+
+                fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'editKategoriBatch', ids: daftarId, tanggalPelunasan: tglLunas })
+                }).then(() => muatDataDariServer()).catch(() => muatDataDariServer());
             } else {
                 let targetTrx = seluruhTransaksi.find(item => String(item.ID) === String(idTrxDipilihUntukLunas));
                 if (!targetTrx) return;
                 
                 let kategoriBaru = targetTrx.Kategori.includes('Piutang') ? 'Piutang Lunas' : 'Hutang Lunas';
-
-                // PERBAIKAN: Ubah data secara instan di UI lokal (Optimistic Update)
                 targetTrx.Kategori = kategoriBaru;
                 renderApp();
 
-                const payload = {
-                    action: 'editKategori',
-                    id: String(idTrxDipilihUntukLunas),
-                    kategoriBaru: kategoriBaru,
-                    tanggalPelunasan: tglLunas
-                };
-
                 fetch(WEB_APP_URL, {
                     method: 'POST',
-                    body: JSON.stringify(payload)
-                })
-                .then(res => res.json())
-                .then(res => {
-                    itemTerpilihSet.clear();
-                    muatDataDariServer();
-                })
-                .catch(err => {
-                    console.error("Gagal sinkronisasi pelunasan:", err);
-                    muatDataDariServer();
-                });
+                    body: JSON.stringify({ action: 'editKategori', id: String(idTrxDipilihUntukLunas), kategoriBaru: kategoriBaru, tanggalPelunasan: tglLunas })
+                }).then(() => muatDataDariServer()).catch(() => muatDataDariServer());
             }
         }
 
         function prosesPelunasanBatch(ids, tglLunas) {
-            // PERBAIKAN: Ubah data secara instan secara lokal untuk batch
             ids.forEach(id => {
                 let targetTrx = seluruhTransaksi.find(item => String(item.ID) === String(id));
                 if (targetTrx) {
@@ -620,24 +612,10 @@
             itemTerpilihSet.clear();
             renderApp();
 
-            const payload = {
-                action: 'editKategoriBatch',
-                ids: ids,
-                tanggalPelunasan: tglLunas
-            };
-
             fetch(WEB_APP_URL, {
                 method: 'POST',
-                body: JSON.stringify(payload)
-            })
-            .then(res => res.json())
-            .then(res => {
-                muatDataDariServer();
-            })
-            .catch(err => {
-                console.error("Gagal sinkronisasi pelunasan massal:", err);
-                muatDataDariServer();
-            });
+                body: JSON.stringify({ action: 'editKategoriBatch', ids: ids, tanggalPelunasan: tglLunas })
+            }).then(() => muatDataDariServer()).catch(() => muatDataDariServer());
         }
 
         function hapusMassal() {
@@ -645,24 +623,10 @@
             if (!confirm(`Apakah Anda yakin ingin menghapus ${itemTerpilihSet.size} transaksi terpilih secara permanen?`)) return;
 
             let ids = Array.from(itemTerpilihSet);
-            const payload = {
-                action: 'hapusBatch',
-                ids: ids
-            };
-
             fetch(WEB_APP_URL, {
                 method: 'POST',
-                body: JSON.stringify(payload)
-            })
-            .then(res => res.json())
-            .then(res => {
-                itemTerpilihSet.clear();
-                muatDataDariServer();
-            })
-            .catch(err => {
-                alert("Gagal menghapus data massal!");
-                muatDataDariServer();
-            });
+                body: JSON.stringify({ action: 'hapusBatch', ids: ids })
+            }).then(() => { itemTerpilihSet.clear(); muatDataDariServer(); }).catch(() => muatDataDariServer());
         }
 
         function simpanTransaksiOnline(event, kategori) {
@@ -721,14 +685,9 @@
             document.getElementById('modalDetail').classList.add('hidden');
             if(!confirm('Apakah Anda yakin ingin menghapus data ini secara permanen dari Cloud?')) return;
 
-            const payload = {
-                action: 'hapus',
-                id: idTrx
-            };
-
             fetch(WEB_APP_URL, {
                 method: 'POST',
-                body: JSON.stringify(payload)
+                body: JSON.stringify({ action: 'hapus', id: idTrx })
             })
             .then(res => res.json())
             .then(res => {
