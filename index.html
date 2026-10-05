@@ -543,7 +543,7 @@
 
         function bukaModalPelunasan(idTrx) {
             document.getElementById('modalDetail').classList.add('hidden');
-            idTrxDipilihUntukLunas = idTrx;
+            idTrxDipilihUntukLunas = String(idTrx);
             const hariIni = new Date().toISOString().split('T')[0];
             document.getElementById('tanggalPelunasanInput').value = hariIni;
             document.getElementById('modalPelunasan').classList.remove('hidden');
@@ -579,7 +579,12 @@
             } else {
                 let targetTrx = seluruhTransaksi.find(item => String(item.ID) === String(idTrxDipilihUntukLunas));
                 if (!targetTrx) return;
+                
                 let kategoriBaru = targetTrx.Kategori.includes('Piutang') ? 'Piutang Lunas' : 'Hutang Lunas';
+
+                // PERBAIKAN: Ubah data secara instan di UI lokal (Optimistic Update)
+                targetTrx.Kategori = kategoriBaru;
+                renderApp();
 
                 const payload = {
                     action: 'editKategori',
@@ -598,13 +603,23 @@
                     muatDataDariServer();
                 })
                 .catch(err => {
-                    alert("Gagal memproses pelunasan!");
+                    console.error("Gagal sinkronisasi pelunasan:", err);
                     muatDataDariServer();
                 });
             }
         }
 
         function prosesPelunasanBatch(ids, tglLunas) {
+            // PERBAIKAN: Ubah data secara instan secara lokal untuk batch
+            ids.forEach(id => {
+                let targetTrx = seluruhTransaksi.find(item => String(item.ID) === String(id));
+                if (targetTrx) {
+                    targetTrx.Kategori = targetTrx.Kategori.includes('Piutang') ? 'Piutang Lunas' : 'Hutang Lunas';
+                }
+            });
+            itemTerpilihSet.clear();
+            renderApp();
+
             const payload = {
                 action: 'editKategoriBatch',
                 ids: ids,
@@ -617,11 +632,10 @@
             })
             .then(res => res.json())
             .then(res => {
-                itemTerpilihSet.clear();
                 muatDataDariServer();
             })
             .catch(err => {
-                alert("Gagal memproses pelunasan massal!");
+                console.error("Gagal sinkronisasi pelunasan massal:", err);
                 muatDataDariServer();
             });
         }
