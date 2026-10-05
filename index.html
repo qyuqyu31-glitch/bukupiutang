@@ -34,9 +34,7 @@
                             </button>
 
                             <div id="subMenuGantiAkun" class="hidden mt-1 pl-2 space-y-1 max-h-40 overflow-y-auto border-l-2 border-blue-200">
-                                <div id="daftarPilihanAkun" class="space-y-1">
-                                    <!-- Daftar akun -->
-                                </div>
+                                <div id="daftarPilihanAkun" class="space-y-1"></div>
                             </div>
                         </div>
 
@@ -143,18 +141,14 @@
         </div>
 
         <!-- MODAL / KARTU INFORMASI LENGKAP DETAIL TRANSAKSI -->
-        <div id="modalDetail" onclick="tutupModalDetail(event)" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-            <div id="kotakKontenDetail" onclick="event.stopPropagation()" class="rounded-2xl max-w-md w-full p-6 shadow-2xl border transition-all">
+        <div id="modalDetail" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <div id="kotakKontenDetail" class="rounded-2xl max-w-md w-full p-6 shadow-2xl border transition-all">
                 <div class="flex justify-between items-center mb-4 pb-2 border-b border-black/10">
                     <h3 class="text-base font-bold text-slate-900">📋 Detail Transaksi</h3>
                     <button type="button" onclick="tutupModalDetailManual()" class="text-slate-600 hover:text-slate-900 font-bold text-base px-2 py-1 cursor-pointer">✕</button>
                 </div>
-                <div id="kontenDetailTransaksi" class="space-y-3 text-sm mb-6">
-                    <!-- Diisi lewat JS -->
-                </div>
-                <div id="aksiDetailTransaksi" class="flex flex-wrap gap-2 justify-end">
-                    <!-- Diisi lewat JS -->
-                </div>
+                <div id="kontenDetailTransaksi" class="space-y-3 text-sm mb-6"></div>
+                <div id="aksiDetailTransaksi" class="flex flex-wrap gap-2 justify-end"></div>
             </div>
         </div>
 
@@ -162,7 +156,7 @@
         <div id="modalPelunasan" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
             <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200">
                 <h3 class="text-base font-bold text-slate-900 mb-2">✨ Konfirmasi Tanggal Pelunasan</h3>
-                <p class="text-xs text-slate-600 mb-4">Masukkan tanggal pelunasan transaksi ini. Jika dibiarkan kosong, tanggal akan otomatis disesuaikan ke hari ini.</p>
+                <p class="text-xs text-slate-600 mb-4">Masukkan tanggal pelunasan transaksi ini. Jika dibiarkan kosong, tanggal otomatis disesuaikan hari ini.</p>
                 <form id="formModalPelunasan" onsubmit="prosesPelunasan(event)">
                     <div class="mb-4">
                         <label class="block text-xs font-semibold text-slate-700 mb-1">Tanggal Pelunasan</label>
@@ -189,9 +183,7 @@
         <!-- TABEL & FILTER -->
         <div class="shadow-sm overflow-hidden mb-6 bg-slate-100 border border-slate-300 rounded-xl">
             <div class="p-3 sm:p-4 border-b border-slate-300 bg-slate-100 flex items-center justify-between gap-2 flex-wrap">
-                <div id="filterContainer" class="flex flex-row items-center gap-1.5 sm:gap-2 overflow-x-auto whitespace-nowrap">
-                    <!-- Tombol Filter -->
-                </div>
+                <div id="filterContainer" class="flex flex-row items-center gap-1.5 sm:gap-2 overflow-x-auto whitespace-nowrap"></div>
                 <button type="button" onclick="muatDataDariServer()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium px-3 py-1.5 rounded-lg transition cursor-pointer flex items-center gap-1 shadow-sm">
                     <span>🔄</span> <span>Sinkronkan Data</span>
                 </button>
@@ -222,7 +214,7 @@
 
     <!-- Skrip JavaScript Online -->
     <script>
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxuSyqfMBlSFI7iesswh8nPWU-mFjnNBtx_uVawfCMLZchAM_LBs8o2Pas___XgdP8XyA/exec";
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyx15XSAgXhYxUvIqlK3Tcrifn5HlZouCPgcCHIrWUgJqzXojKHur6ab-y8ocVcADNX5g/exec";
         
         let seluruhTransaksi = [];
         let akunAktif = localStorage.getItem('akun_aktif_piutang_ online') || "Pencatatan Piutang Toko";
@@ -238,14 +230,12 @@
                 input.value = '';
                 return;
             }
-            let angkaFormat = Number(angkaBersih).toLocaleString('id-ID');
-            input.value = `Rp ${angkaFormat}`;
+            input.value = `Rp ${Number(angkaBersih).toLocaleString('id-ID')}`;
         }
 
         function bukaFormPiutang(jenis) {
             tutupForm();
             const hariIni = new Date().toISOString().split('T')[0];
-
             if (jenis === 'Piutang') {
                 const el = document.getElementById('containerFormPiutang');
                 el.classList.remove('hidden');
@@ -281,7 +271,7 @@
                 })
                 .catch(error => {
                     console.error('Gagal memuat:', error);
-                    tabelBody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-rose-600 font-medium">Gagal memuat data. Cek koneksi internet Anda.</td></tr>`;
+                    tabelBody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-rose-600 font-medium">Gagal memuat data. Cek koneksi internet/URL Apps Script.</td></tr>`;
                 });
         }
 
@@ -338,32 +328,16 @@
             `;
 
             let btnSemua = document.getElementById('fSemua');
-            if (statusFilter === 'Semua') {
-                btnSemua.className = "font-bold py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-slate-900 bg-slate-900 text-white shadow-sm shrink-0";
-            } else {
-                btnSemua.className = "font-medium py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-slate-300 bg-white text-slate-700 shadow-sm shrink-0";
-            }
+            btnSemua.className = statusFilter === 'Semua' ? "font-bold py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-slate-900 bg-slate-900 text-white shadow-sm shrink-0" : "font-medium py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-slate-300 bg-white text-slate-700 shadow-sm shrink-0";
 
             let btnPiutang = document.getElementById('fPiutang');
-            if (statusFilter === 'Piutang') {
-                btnPiutang.className = "font-bold py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-rose-600 bg-rose-600 text-white shadow-sm shrink-0";
-            } else {
-                btnPiutang.className = "font-medium py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-rose-600 bg-white text-rose-700 shadow-sm shrink-0";
-            }
+            btnPiutang.className = statusFilter === 'Piutang' ? "font-bold py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-rose-600 bg-rose-600 text-white shadow-sm shrink-0" : "font-medium py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-rose-600 bg-white text-rose-700 shadow-sm shrink-0";
 
             let btnHutang = document.getElementById('fHutang');
-            if (statusFilter === 'Hutang') {
-                btnHutang.className = "font-bold py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-blue-600 bg-blue-600 text-white shadow-sm shrink-0";
-            } else {
-                btnHutang.className = "font-medium py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-blue-600 bg-white text-blue-700 shadow-sm shrink-0";
-            }
+            btnHutang.className = statusFilter === 'Hutang' ? "font-bold py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-blue-600 bg-blue-600 text-white shadow-sm shrink-0" : "font-medium py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-blue-600 bg-white text-blue-700 shadow-sm shrink-0";
 
             let btnLunas = document.getElementById('fLunas');
-            if (statusFilter === 'Lunas') {
-                btnLunas.className = "font-bold py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-emerald-600 bg-emerald-600 text-white shadow-sm shrink-0";
-            } else {
-                btnLunas.className = "font-medium py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-emerald-600 bg-white text-emerald-700 shadow-sm shrink-0";
-            }
+            btnLunas.className = statusFilter === 'Lunas' ? "font-bold py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-emerald-600 bg-emerald-600 text-white shadow-sm shrink-0" : "font-medium py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-emerald-600 bg-white text-emerald-700 shadow-sm shrink-0";
 
             let transaksiDitampilkan = transaksiAkunIni.filter(item => {
                 if (statusFilter === 'Semua') return true;
@@ -389,45 +363,28 @@
                 let teksStatus = "";
                 let tombolAksiLunas = "";
 
-                if (item.Kategori === 'Piutang') {
-                    bgRowClass = "bg-rose-200 active:bg-rose-300 hover:bg-rose-300";
-                    teksKategori = "Piutang";
-                    teksStatus = '<span class="px-2 py-0.5 rounded text-xs font-bold bg-rose-700 text-white">Belum Lunas</span>';
-                    tombolAksiLunas = `<button type="button" onclick="bukaModalPelunasan('${item.ID}')" class="bg-gradient-to-b from-emerald-500 to-emerald-700 hover:from-emerald-400 hover:to-emerald-600 active:from-slate-400 active:to-slate-500 active:translate-y-1 text-white px-3.5 py-1.5 rounded-xl text-xs font-bold shadow-[0_4px_0_0_#047857] active:shadow-none transition-all cursor-pointer">Lunaskan</button>`;
-                } else if (item.Kategori === 'Hutang') {
-                    bgRowClass = "bg-blue-200 active:bg-blue-300 hover:bg-blue-300";
-                    teksKategori = "Hutang";
-                    teksStatus = '<span class="px-2 py-0.5 rounded text-xs font-bold bg-blue-700 text-white">Belum Lunas</span>';
-                    tombolAksiLunas = `<button type="button" onclick="bukaModalPelunasan('${item.ID}')" class="bg-gradient-to-b from-emerald-500 to-emerald-700 hover:from-emerald-400 hover:to-emerald-600 active:from-slate-400 active:to-slate-500 active:translate-y-1 text-white px-3.5 py-1.5 rounded-xl text-xs font-bold shadow-[0_4px_0_0_#047857] active:shadow-none transition-all cursor-pointer">Lunaskan</button>`;
-                } else if (item.Kategori === 'Piutang Lunas' || item.Kategori === 'Hutang Lunas') {
-                    bgRowClass = "bg-emerald-200 active:bg-emerald-300 hover:bg-emerald-300";
+                if (item.Kategori === 'Piutang' || item.Kategori === 'Hutang') {
+                    bgRowClass = item.Kategori === 'Piutang' ? "bg-rose-200 hover:bg-rose-300" : "bg-blue-200 hover:bg-blue-300";
+                    teksKategori = item.Kategori;
+                    teksStatus = `<span class="px-2 py-0.5 rounded text-xs font-bold ${item.Kategori === 'Piutang' ? 'bg-rose-700' : 'bg-blue-700'} text-white">Belum Lunas</span>`;
+                    
+                    // Tombol 3D Hijau dengan class unik agar mudah ditangkap event listener
+                    tombolAksiLunas = `<button type="button" data-id="${item.ID}" class="btn-lunaskan bg-gradient-to-b from-emerald-500 to-emerald-700 hover:from-emerald-400 hover:to-emerald-600 active:from-slate-400 active:translate-y-1 text-white px-3.5 py-1.5 rounded-xl text-xs font-bold shadow-[0_4px_0_0_#047857] active:shadow-none transition-all cursor-pointer">Lunaskan</button>`;
+                } else {
+                    bgRowClass = "bg-emerald-200 hover:bg-emerald-300";
                     teksKategori = item.Kategori.replace(' Lunas', '');
                     teksStatus = '<span class="px-2 py-0.5 rounded text-xs font-bold bg-emerald-700 text-white">Lunas</span>';
                     tombolAksiLunas = `<button type="button" disabled class="bg-slate-300 text-slate-600 px-3 py-1 rounded-xl text-xs font-bold shadow-inner cursor-not-allowed">Lunaskan</button>`;
                 }
 
                 let isChecked = itemTerpilihSet.has(item.ID);
-                let checkClass = isChecked ? 'accent-slate-900 scale-110' : '';
                 let tanggalFormatted = item.Tanggal ? new Date(item.Tanggal).toISOString().split('T')[0] : '-';
 
                 let tr = document.createElement('tr');
                 tr.className = `${bgRowClass} transition-colors cursor-pointer`;
-                tr.dataset.id = item.ID;
-
-                tr.onclick = (e) => {
-                    if (e.target.type === 'checkbox' || e.target.tagName === 'BUTTON') return;
-                    bukaDetailTransaksi(item.ID);
-                };
-
-                tr.onmousedown = () => startLongPress(item.ID);
-                tr.ontouchstart = () => startLongPress(item.ID);
-                tr.onmouseup = cancelLongPress;
-                tr.ontouchend = cancelLongPress;
-                tr.onmouseleave = cancelLongPress;
-
                 tr.innerHTML = `
                     <td class="p-3 text-center" onclick="event.stopPropagation()">
-                        <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="togglePilihItem('${item.ID}')" class="w-4 h-4 rounded cursor-pointer ${checkClass}">
+                        <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="togglePilihItem('${item.ID}')" class="w-4 h-4 rounded cursor-pointer">
                     </td>
                     <td class="p-3 text-slate-800 text-xs font-medium">${tanggalFormatted}</td>
                     <td class="p-3 font-bold text-slate-900">${item.Nama}</td>
@@ -435,34 +392,32 @@
                     <td class="p-3 font-bold text-slate-900">Rp ${Number(item.Jumlah).toLocaleString('id-ID')}</td>
                     <td class="p-3 text-slate-800 text-xs font-medium">${item.Keterangan || '-'}</td>
                     <td class="p-3">${teksStatus}</td>
-                    <td class="p-3 text-center" onclick="event.stopPropagation()">${tombolAksiLunas}</td>
+                    <td class="p-3 text-center aksi-kolom">${tombolAksiLunas}</td>
                 `;
+
+                // Event listener klik baris untuk detail
+                tr.onclick = (e) => {
+                    if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON') return;
+                    bukaDetailTransaksi(item.ID);
+                };
+
                 tabelData.appendChild(tr);
+            });
+
+            // Pasang event listener langsung ke semua tombol lunaskan yang baru dirender
+            document.querySelectorAll('.btn-lunaskan').forEach(btn => {
+                btn.onclick = (e) => {
+                    e.stopPropagation();
+                    bukaModalPelunasan(btn.getAttribute('data-id'));
+                };
             });
 
             updateActionBarMassal();
         }
 
-        function startLongPress(id) {
-            longPressTimer = setTimeout(() => {
-                togglePilihItem(id);
-                renderApp();
-            }, 600);
-        }
-
-        function cancelLongPress() {
-            if (longPressTimer) {
-                clearTimeout(longPressTimer);
-                longPressTimer = null;
-            }
-        }
-
         function togglePilihItem(id) {
-            if (itemTerpilihSet.has(id)) {
-                itemTerpilihSet.delete(id);
-            } else {
-                itemTerpilihSet.add(id);
-            }
+            if (itemTerpilihSet.has(id)) itemTerpilihSet.delete(id);
+            else itemTerpilihSet.add(id);
             updateActionBarMassal();
             renderApp();
         }
@@ -496,13 +451,7 @@
 
             let kotakKonten = document.getElementById('kotakKontenDetail');
             kotakKonten.className = "rounded-2xl max-w-md w-full p-6 shadow-2xl border transition-all ";
-            if (item.Kategori === 'Piutang') {
-                kotakKonten.classList.add('bg-rose-200', 'border-rose-400');
-            } else if (item.Kategori === 'Hutang') {
-                kotakKonten.classList.add('bg-blue-200', 'border-blue-400');
-            } else {
-                kotakKonten.classList.add('bg-emerald-200', 'border-emerald-400');
-            }
+            kotakKonten.classList.add(item.Kategori === 'Piutang' ? 'bg-rose-200 border-rose-400' : (item.Kategori === 'Hutang' ? 'bg-blue-200 border-blue-400' : 'bg-emerald-200 border-emerald-400'));
 
             let kontentEl = document.getElementById('kontenDetailTransaksi');
             kontentEl.innerHTML = `
@@ -516,23 +465,16 @@
             `;
 
             let aksiEl = document.getElementById('aksiDetailTransaksi');
-            let tombolLunasDetail = !isLunas ? `<button type="button" onclick="bukaModalPelunasan('${item.ID}')" class="bg-gradient-to-b from-emerald-500 to-emerald-700 hover:from-emerald-400 hover:to-emerald-600 active:from-slate-400 active:to-slate-500 active:translate-y-1 text-white font-bold py-2 px-4 rounded-xl text-xs shadow-[0_4px_0_0_#047857] active:shadow-none transition-all cursor-pointer">Lunaskan</button>` : '';
+            let tombolLunasDetail = !isLunas ? `<button type="button" onclick="bukaModalPelunasan('${item.ID}')" class="bg-gradient-to-b from-emerald-500 to-emerald-700 text-white font-bold py-2 px-4 rounded-xl text-xs shadow-md cursor-pointer">Lunaskan</button>` : '';
             let linkWA = `https://wa.me/?text=${encodeURIComponent(`Halo ${item.Nama}, sekadar mengingatkan terkait catatan ${kategoriAsli.toLowerCase()} sebesar Rp${Number(item.Jumlah).toLocaleString('id-ID')}. Terima kasih.`)}`;
 
-            let logoWA = `<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>`;
-
             aksiEl.innerHTML = `
-                <a href="${linkWA}" target="_blank" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 px-3 rounded-xl text-xs transition cursor-pointer shadow-sm flex items-center gap-1.5">${logoWA} <span>WhatsApp</span></a>
+                <a href="${linkWA}" target="_blank" class="bg-emerald-600 text-white font-medium py-2 px-3 rounded-xl text-xs shadow-sm flex items-center gap-1.5">WhatsApp</a>
                 ${tombolLunasDetail}
-                <button type="button" onclick="hapusDataOnline('${item.ID}')" class="bg-rose-700 hover:bg-rose-800 text-white font-medium py-2 px-3 rounded-xl text-xs transition cursor-pointer shadow-sm">Hapus</button>
+                <button type="button" onclick="hapusDataOnline('${item.ID}')" class="bg-rose-700 text-white font-medium py-2 px-3 rounded-xl text-xs shadow-sm">Hapus</button>
             `;
 
             document.getElementById('modalDetail').classList.remove('hidden');
-        }
-
-        function tutupModalDetail(event) {
-            document.getElementById('modalDetail').classList.add('hidden');
-            idTrxDetailAktif = null;
         }
 
         function tutupModalDetailManual() {
@@ -543,16 +485,14 @@
         function bukaModalPelunasan(idTrx) {
             document.getElementById('modalDetail').classList.add('hidden');
             idTrxDipilihUntukLunas = String(idTrx);
-            const hariIni = new Date().toISOString().split('T')[0];
-            document.getElementById('tanggalPelunasanInput').value = hariIni;
+            document.getElementById('tanggalPelunasanInput').value = new Date().toISOString().split('T')[0];
             document.getElementById('modalPelunasan').classList.remove('hidden');
         }
 
         function bukaModalPelunasanMassal() {
             if (itemTerpilihSet.size === 0) return;
             idTrxDipilihUntukLunas = 'MASSAL';
-            const hariIni = new Date().toISOString().split('T')[0];
-            document.getElementById('tanggalPelunasanInput').value = hariIni;
+            document.getElementById('tanggalPelunasanInput').value = new Date().toISOString().split('T')[0];
             document.getElementById('modalPelunasan').classList.remove('hidden');
         }
 
@@ -565,68 +505,31 @@
             e.preventDefault();
             if (!idTrxDipilihUntukLunas) return;
 
-            let tglLunas = document.getElementById('tanggalPelunasanInput').value;
-            if (!tglLunas) {
-                tglLunas = new Date().toISOString().split('T')[0];
-            }
-
+            let tglLunas = document.getElementById('tanggalPelunasanInput').value || new Date().toISOString().split('T')[0];
             tutupModalPelunasan();
 
             if (idTrxDipilihUntukLunas === 'MASSAL') {
                 let daftarId = Array.from(itemTerpilihSet);
                 daftarId.forEach(id => {
-                    let targetTrx = seluruhTransaksi.find(item => String(item.ID) === String(id));
-                    if (targetTrx) {
-                        targetTrx.Kategori = targetTrx.Kategori.includes('Piutang') ? 'Piutang Lunas' : 'Hutang Lunas';
-                    }
+                    let target = seluruhTransaksi.find(t => String(t.ID) === String(id));
+                    if (target) target.Kategori = target.Kategori.includes('Piutang') ? 'Piutang Lunas' : 'Hutang Lunas';
                 });
                 itemTerpilihSet.clear();
                 renderApp();
 
-                fetch(WEB_APP_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({ action: 'editKategoriBatch', ids: daftarId, tanggalPelunasan: tglLunas })
-                }).then(() => muatDataDariServer()).catch(() => muatDataDariServer());
+                fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify({ action: 'editKategoriBatch', ids: daftarId, tanggalPelunasan: tglLunas }) })
+                .then(() => muatDataDariServer()).catch(() => muatDataDariServer());
             } else {
-                let targetTrx = seluruhTransaksi.find(item => String(item.ID) === String(idTrxDipilihUntukLunas));
-                if (!targetTrx) return;
-                
-                let kategoriBaru = targetTrx.Kategori.includes('Piutang') ? 'Piutang Lunas' : 'Hutang Lunas';
-                targetTrx.Kategori = kategoriBaru;
+                let target = seluruhTransaksi.find(t => String(t.ID) === String(idTrxDipilihUntukLunas));
+                if (!target) return;
+
+                let kategoriBaru = target.Kategori.includes('Piutang') ? 'Piutang Lunas' : 'Hutang Lunas';
+                target.Kategori = kategoriBaru;
                 renderApp();
 
-                fetch(WEB_APP_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({ action: 'editKategori', id: String(idTrxDipilihUntukLunas), kategoriBaru: kategoriBaru, tanggalPelunasan: tglLunas })
-                }).then(() => muatDataDariServer()).catch(() => muatDataDariServer());
+                fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify({ action: 'editKategori', id: String(idTrxDipilihUntukLunas), kategoriBaru: kategoriBaru, tanggalPelunasan: tglLunas }) })
+                .then(() => muatDataDariServer()).catch(() => muatDataDariServer());
             }
-        }
-
-        function prosesPelunasanBatch(ids, tglLunas) {
-            ids.forEach(id => {
-                let targetTrx = seluruhTransaksi.find(item => String(item.ID) === String(id));
-                if (targetTrx) {
-                    targetTrx.Kategori = targetTrx.Kategori.includes('Piutang') ? 'Piutang Lunas' : 'Hutang Lunas';
-                }
-            });
-            itemTerpilihSet.clear();
-            renderApp();
-
-            fetch(WEB_APP_URL, {
-                method: 'POST',
-                body: JSON.stringify({ action: 'editKategoriBatch', ids: ids, tanggalPelunasan: tglLunas })
-            }).then(() => muatDataDariServer()).catch(() => muatDataDariServer());
-        }
-
-        function hapusMassal() {
-            if (itemTerpilihSet.size === 0) return;
-            if (!confirm(`Apakah Anda yakin ingin menghapus ${itemTerpilihSet.size} transaksi terpilih secara permanen?`)) return;
-
-            let ids = Array.from(itemTerpilihSet);
-            fetch(WEB_APP_URL, {
-                method: 'POST',
-                body: JSON.stringify({ action: 'hapusBatch', ids: ids })
-            }).then(() => { itemTerpilihSet.clear(); muatDataDariServer(); }).catch(() => muatDataDariServer());
         }
 
         function simpanTransaksiOnline(event, kategori) {
@@ -647,26 +550,15 @@
                 btnSubmit = document.getElementById('btnSubmitHutang');
             }
 
-            btnSubmit.innerText = "Menyimpan ke Cloud...";
+            btnSubmit.innerText = "Menyimpan...";
             btnSubmit.disabled = true;
-
-            const payload = {
-                action: 'tambah',
-                id: 'TRX-' + Date.now(),
-                tanggal: tanggal,
-                nama: nama,
-                kategori: kategori,
-                jumlah: rawJumlah,
-                keterangan: keterangan,
-                akun: akunAktif
-            };
 
             fetch(WEB_APP_URL, {
                 method: 'POST',
-                body: JSON.stringify(payload)
+                body: JSON.stringify({ action: 'tambah', id: 'TRX-' + Date.now(), tanggal: tanggal, nama: nama, kategori: kategori, jumlah: rawJumlah, keterangan: keterangan, akun: akunAktif })
             })
             .then(res => res.json())
-            .then(res => {
+            .then(() => {
                 btnSubmit.innerText = kategori === 'Piutang' ? "Simpan Piutang" : "Simpan Hutang";
                 btnSubmit.disabled = false;
                 if (kategori === 'Piutang') document.getElementById('formPiutang').reset();
@@ -674,44 +566,24 @@
                 tutupForm();
                 muatDataDariServer();
             })
-            .catch(err => {
-                alert("Gagal menyimpan ke server!");
-                btnSubmit.innerText = kategori === 'Piutang' ? "Simpan Piutang" : "Simpan Hutang";
+            .catch(() => {
+                alert("Gagal menyimpan!");
                 btnSubmit.disabled = false;
             });
         }
 
         function hapusDataOnline(idTrx) {
             document.getElementById('modalDetail').classList.add('hidden');
-            if(!confirm('Apakah Anda yakin ingin menghapus data ini secara permanen dari Cloud?')) return;
+            if(!confirm('Hapus data ini secara permanen?')) return;
 
-            fetch(WEB_APP_URL, {
-                method: 'POST',
-                body: JSON.stringify({ action: 'hapus', id: idTrx })
-            })
-            .then(res => res.json())
-            .then(res => {
-                itemTerpilihSet.delete(idTrx);
-                muatDataDariServer();
-            })
-            .catch(err => {
-                alert("Gagal menghapus data!");
-                muatDataDariServer();
-            });
+            fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify({ action: 'hapus', id: idTrx }) })
+            .then(() => muatDataDariServer())
+            .catch(() => muatDataDariServer());
         }
 
         function toggleMenuAksiAkun(event) {
             event.stopPropagation();
-            const menuAksi = document.getElementById('menuAksiAkun');
-            const btnMenuAkun = document.getElementById('btnMenuAkun');
-
-            if (menuAksi.classList.contains('hidden')) {
-                document.getElementById('subMenuGantiAkun').classList.add('hidden');
-                menuAksi.classList.remove('hidden');
-                btnMenuAkun.className = "bg-white text-slate-900 p-2.5 rounded-t-lg rounded-b-none text-sm transition cursor-pointer flex items-center justify-center border-2 border-slate-200 border-b-0 shadow-none z-50 relative";
-            } else {
-                tutupMenuAksi();
-            }
+            document.getElementById('menuAksiAkun').classList.toggle('hidden');
         }
 
         function toggleSubMenuAkun(event) {
@@ -720,21 +592,14 @@
         }
 
         function tutupMenuAksi() {
-            const menuAksi = document.getElementById('menuAksiAkun');
-            const btnMenuAkun = document.getElementById('btnMenuAkun');
-            if (menuAksi && !menuAksi.classList.contains('hidden')) {
-                menuAksi.classList.add('hidden');
-                document.getElementById('subMenuGantiAkun').classList.add('hidden');
-                btnMenuAkun.className = "bg-slate-900 hover:bg-black text-white p-2.5 rounded-lg text-sm transition cursor-pointer flex items-center justify-center border border-white/20 shadow-sm";
-            }
+            document.getElementById('menuAksiAkun').classList.add('hidden');
+            document.getElementById('subMenuGantiAkun').classList.add('hidden');
         }
 
-        window.addEventListener('click', function() {
-            tutupMenuAksi();
-        });
+        window.addEventListener('click', tutupMenuAksi);
 
-        function gantiAkun(namaAkunBaru) {
-            akunAktif = namaAkunBaru;
+        function gantiAkun(namaBaru) {
+            akunAktif = namaBaru;
             localStorage.setItem('akun_aktif_piutang_ online', akunAktif);
             statusFilter = 'Semua';
             itemTerpilihSet.clear();
@@ -742,41 +607,21 @@
         }
 
         function tambahBukuKasBaru() {
-            tutupMenuAksi();
-            let namaBaru = prompt("Masukkan nama Akun / Buku Piutang baru:");
-            if (!namaBaru || namaBaru.trim() === "") return;
-            namaBaru = namaBaru.trim();
-            gantiAkun(namaBaru);
+            let namaBaru = prompt("Masukkan nama Akun / Buku baru:");
+            if (namaBaru && namaBaru.trim() !== "") gantiAkun(namaBaru.trim());
         }
 
         function editNamaAkun() {
             let namaBaru = prompt("Ubah nama Akun:", akunAktif);
-            if (namaBaru === null) return;
-            namaBaru = namaBaru.trim();
-            if (namaBaru === "") {
-                alert("Nama akun tidak boleh kosong!");
-                return;
+            if (namaBaru && namaBaru.trim() !== "") {
+                akunAktif = namaBaru.trim();
+                localStorage.setItem('akun_aktif_piutang_ online', akunAktif);
+                renderApp();
             }
-            if (namaBaru === akunAktif) return;
-            
-            seluruhTransaksi.forEach(item => {
-                if ((item.Akun || "Pencatatan Piutang Toko") === akunAktif) {
-                    item.Akun = namaBaru;
-                }
-            });
-            akunAktif = namaBaru;
-            localStorage.setItem('akun_aktif_piutang_ online', akunAktif);
-            renderApp();
-            alert("Nama akun berhasil diubah di tampilan ini.");
         }
 
         function hapusAkunAktif() {
-            tutupMenuAksi();
-            if (confirm(`Apakah Anda yakin ingin mengganti/membersihkan pandangan akun "${akunAktif}"?`)) {
-                akunAktif = "Pencatatan Piutang Toko";
-                itemTerpilihSet.clear();
-                renderApp();
-            }
+            if (confirm(`Reset tampilan ke akun default?`)) gantiAkun("Pencatatan Piutang Toko");
         }
 
         muatDataDariServer();
