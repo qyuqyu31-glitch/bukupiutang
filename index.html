@@ -6,7 +6,7 @@
     <title>Aplikasi Buku Kas Khusus Piutang & Hutang (Online)</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans select-none">
+<body class="bg-slate-50text-slate-800 font-sans select-none">
 
     <!-- Container Utama -->
     <div class="max-w-5xl mx-auto p-4 sm:p-6 pb-24">
@@ -157,7 +157,9 @@
             <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200">
                 <h3 class="text-base font-bold text-slate-900 mb-2">✨ Konfirmasi Tanggal Pelunasan</h3>
                 <p class="text-xs text-slate-600 mb-4">Masukkan tanggal pelunasan transaksi ini. Jika dibiarkan kosong, tanggal otomatis disesuaikan hari ini.</p>
+                <!-- Menyimpan ID langsung pada atribut form agar aman dari hilangnya variabel -->
                 <form id="formModalPelunasan" onsubmit="prosesPelunasan(event)">
+                    <input type="hidden" id="inputHiddenIdTrx">
                     <div class="mb-4">
                         <label class="block text-xs font-semibold text-slate-700 mb-1">Tanggal Pelunasan</label>
                         <input type="date" id="tanggalPelunasanInput" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm shadow-sm">
@@ -219,7 +221,6 @@
         let seluruhTransaksi = [];
         let akunAktif = localStorage.getItem('akun_aktif_piutang_ online') || "Pencatatan Piutang Toko";
         let statusFilter = 'Semua';
-        let idTrxDipilihUntukLunas = null;
         let idTrxDetailAktif = null;
         let itemTerpilihSet = new Set();
         let longPressTimer = null;
@@ -368,7 +369,6 @@
                     teksKategori = item.Kategori;
                     teksStatus = `<span class="px-2 py-0.5 rounded text-xs font-bold ${item.Kategori === 'Piutang' ? 'bg-rose-700' : 'bg-blue-700'} text-white">Belum Lunas</span>`;
                     
-                    // Tombol 3D Hijau dengan class unik agar mudah ditangkap event listener
                     tombolAksiLunas = `<button type="button" data-id="${item.ID}" class="btn-lunaskan bg-gradient-to-b from-emerald-500 to-emerald-700 hover:from-emerald-400 hover:to-emerald-600 active:from-slate-400 active:translate-y-1 text-white px-3.5 py-1.5 rounded-xl text-xs font-bold shadow-[0_4px_0_0_#047857] active:shadow-none transition-all cursor-pointer">Lunaskan</button>`;
                 } else {
                     bgRowClass = "bg-emerald-200 hover:bg-emerald-300";
@@ -395,7 +395,6 @@
                     <td class="p-3 text-center aksi-kolom">${tombolAksiLunas}</td>
                 `;
 
-                // Event listener klik baris untuk detail
                 tr.onclick = (e) => {
                     if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON') return;
                     bukaDetailTransaksi(item.ID);
@@ -404,7 +403,7 @@
                 tabelData.appendChild(tr);
             });
 
-            // Pasang event listener langsung ke semua tombol lunaskan yang baru dirender
+            // Pasang event listener tombol lunaskan
             document.querySelectorAll('.btn-lunaskan').forEach(btn => {
                 btn.onclick = (e) => {
                     e.stopPropagation();
@@ -482,33 +481,36 @@
             idTrxDetailAktif = null;
         }
 
+        // PERBAIKAN UTAMA: Menyimpan ID secara aman ke elemen tersembunyi
         function bukaModalPelunasan(idTrx) {
             document.getElementById('modalDetail').classList.add('hidden');
-            idTrxDipilihUntukLunas = String(idTrx);
+            document.getElementById('inputHiddenIdTrx').value = String(idTrx);
             document.getElementById('tanggalPelunasanInput').value = new Date().toISOString().split('T')[0];
             document.getElementById('modalPelunasan').classList.remove('hidden');
         }
 
         function bukaModalPelunasanMassal() {
             if (itemTerpilihSet.size === 0) return;
-            idTrxDipilihUntukLunas = 'MASSAL';
+            document.getElementById('inputHiddenIdTrx').value = 'MASSAL';
             document.getElementById('tanggalPelunasanInput').value = new Date().toISOString().split('T')[0];
             document.getElementById('modalPelunasan').classList.remove('hidden');
         }
 
         function tutupModalPelunasan() {
             document.getElementById('modalPelunasan').classList.add('hidden');
-            idTrxDipilihUntukLunas = null;
+            document.getElementById('inputHiddenIdTrx').value = '';
         }
 
+        // PERBAIKAN UTAMA: Membaca ID langsung dari input tersembunyi saat konfirmasi diklik
         function prosesPelunasan(e) {
             e.preventDefault();
-            if (!idTrxDipilihUntukLunas) return;
+            let idTrxTarget = document.getElementById('inputHiddenIdTrx').value;
+            if (!idTrxTarget) return;
 
             let tglLunas = document.getElementById('tanggalPelunasanInput').value || new Date().toISOString().split('T')[0];
             tutupModalPelunasan();
 
-            if (idTrxDipilihUntukLunas === 'MASSAL') {
+            if (idTrxTarget === 'MASSAL') {
                 let daftarId = Array.from(itemTerpilihSet);
                 daftarId.forEach(id => {
                     let target = seluruhTransaksi.find(t => String(t.ID) === String(id));
@@ -520,14 +522,14 @@
                 fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify({ action: 'editKategoriBatch', ids: daftarId, tanggalPelunasan: tglLunas }) })
                 .then(() => muatDataDariServer()).catch(() => muatDataDariServer());
             } else {
-                let target = seluruhTransaksi.find(t => String(t.ID) === String(idTrxDipilihUntukLunas));
+                let target = seluruhTransaksi.find(t => String(t.ID) === String(idTrxTarget));
                 if (!target) return;
 
                 let kategoriBaru = target.Kategori.includes('Piutang') ? 'Piutang Lunas' : 'Hutang Lunas';
                 target.Kategori = kategoriBaru;
-                renderApp();
+                renderApp(); // UI Langsung berubah hijau dan tombol jadi abu-abu tenggelam seketika
 
-                fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify({ action: 'editKategori', id: String(idTrxDipilihUntukLunas), kategoriBaru: kategoriBaru, tanggalPelunasan: tglLunas }) })
+                fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify({ action: 'editKategori', id: String(idTrxTarget), kategoriBaru: kategoriBaru, tanggalPelunasan: tglLunas }) })
                 .then(() => muatDataDariServer()).catch(() => muatDataDariServer());
             }
         }
