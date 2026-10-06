@@ -374,7 +374,7 @@
             tabelDesktop.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-blue-600 font-medium italic">Menghubungkan ke server...</td></tr>`;
             tabelMobile.innerHTML = `<div class="p-4 text-center text-blue-600 font-medium italic text-xs">Menghubungkan ke server...</div>`;
 
-            fetch(WEB_APP_URL)
+            fetch(WEB_APP_URL + "?t=" + new Date().getTime())
                 .then(response => response.json())
                 .then(data => {
                     seluruhTransaksi = data;
