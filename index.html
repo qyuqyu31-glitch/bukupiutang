@@ -5,6 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aplikasi Buku Kas Khusus Piutang & Hutang (Online)</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Tombol Pengaturan 3D Hitam Menonjol & Efek Tenggelam */
+        .settings-btn-3d {
+            background: linear-gradient(135deg, #333333 0%, #111111 100%);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            transition: all 0.15s ease;
+        }
+        .settings-btn-3d:hover {
+            background: linear-gradient(135deg, #444444 0%, #222222 100%);
+            transform: translateY(-1px);
+        }
+        .settings-btn-3d:active {
+            transform: translateY(1px);
+        }
+        /* Status Aktif: Abu-abu Tenggelam (Inset) */
+        .settings-btn-3d.active {
+            background: linear-gradient(135deg, #d1d5db 0%, #9ca3af 100%) !important;
+            color: #374151 !important;
+            box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(255, 255, 255, 0.5) !important;
+            transform: translateY(2px) !important;
+        }
+    </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans select-none">
 
@@ -183,11 +205,47 @@
 
         <!-- TABEL & FILTER -->
         <div class="shadow-sm overflow-hidden mb-6 bg-slate-100 border border-slate-300 rounded-xl">
-            <div class="p-3 sm:p-4 border-b border-slate-300 bg-slate-100 flex items-center justify-between gap-2 flex-wrap">
+            <!-- Header Bar Tabel dengan Tombol Pengaturan 3D di Paling Kanan -->
+            <div class="p-3 sm:p-4 border-b border-slate-300 bg-slate-100 flex items-center justify-between gap-2 flex-wrap relative">
                 <div id="filterContainer" class="flex flex-row items-center gap-1.5 sm:gap-2 overflow-x-auto whitespace-nowrap"></div>
-                <button type="button" onclick="muatDataDariServer()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium px-3 py-1.5 rounded-lg transition cursor-pointer flex items-center gap-1 shadow-sm">
-                    <span>🔄</span> <span>Sinkronkan Data</span>
-                </button>
+                
+                <div class="flex items-center gap-2">
+                    <button type="button" onclick="muatDataDariServer()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium px-3 py-2 rounded-lg transition cursor-pointer flex items-center gap-1 shadow-sm h-10">
+                        <span>🔄</span> <span>Sinkronkan</span>
+                    </button>
+
+                    <!-- Tombol Pengaturan 3D Hitam Menonjol -->
+                    <div class="relative">
+                        <button type="button" id="settingsBtn" onclick="toggleSettingsPopup(event)" class="settings-btn-3d text-white w-10 h-10 rounded-xl flex items-center justify-center cursor-pointer shadow-md" title="Pengaturan Tabel">
+                            <svg class="w-5 h-5 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                            </svg>
+                        </button>
+
+                        <!-- Pop-up Menu Pengaturan Tabel -->
+                        <div id="settingsPopup" class="hidden absolute right-0 mt-2 w-72 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 p-3">
+                            <div class="flex justify-between items-center mb-2 pb-1 border-b border-slate-100">
+                                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">Pengaturan Tabel</h3>
+                                <button type="button" onclick="tutupSettingsPopup()" class="text-slate-400 hover:text-slate-700 text-xs font-bold cursor-pointer">✕</button>
+                            </div>
+                            <div class="space-y-1">
+                                <p class="text-[11px] font-semibold text-slate-600 mb-1">Opsi Urutkan:</p>
+                                <button type="button" onclick="pilihOpsiUrutkan('date-desc')" id="sortDateDesc" class="w-full text-left px-2.5 py-2 text-xs rounded-lg transition cursor-pointer hover:bg-slate-100 text-slate-700 flex justify-between items-center">
+                                    <span>📅 Tanggal Terbaru ke Terlama</span>
+                                </button>
+                                <button type="button" onclick="pilihOpsiUrutkan('date-asc')" id="sortDateAsc" class="w-full text-left px-2.5 py-2 text-xs rounded-lg transition cursor-pointer hover:bg-slate-100 text-slate-700 flex justify-between items-center">
+                                    <span>📆 Tanggal Terlama ke Terbaru</span>
+                                </button>
+                                <button type="button" onclick="pilihOpsiUrutkan('input-desc')" id="sortInputDesc" class="w-full text-left px-2.5 py-2 text-xs rounded-lg transition cursor-pointer hover:bg-slate-100 text-slate-700 flex justify-between items-center">
+                                    <span>📥 Pencatatan Transaksi Terbaru</span>
+                                </button>
+                                <button type="button" onclick="pilihOpsiUrutkan('input-asc')" id="sortInputAsc" class="w-full text-left px-2.5 py-2 text-xs rounded-lg transition cursor-pointer hover:bg-slate-100 text-slate-700 flex justify-between items-center">
+                                    <span>📤 Catatan Transaksi Terlama</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="overflow-x-auto bg-white">
@@ -220,9 +278,10 @@
         let seluruhTransaksi = [];
         let akunAktif = localStorage.getItem('akun_aktif_piutang_ online') || "Pencatatan Piutang Toko";
         let statusFilter = 'Semua';
+        let currentSort = localStorage.getItem('sort_setting_piutang') || 'date-desc';
         let idTrxDetailAktif = null;
         let itemTerpilihSet = new Set();
-        let isModeEditSemua = false; // Status apakah sedang mengedit semua detail
+        let isModeEditSemua = false;
 
         function formatInputRupiah(input) {
             let angkaBersih = input.value.replace(/[^0-9]/g, '');
@@ -268,6 +327,32 @@
             statusFilter = filter;
             renderApp();
         }
+
+        function toggleSettingsPopup(event) {
+            event.stopPropagation();
+            const popup = document.getElementById('settingsPopup');
+            const btn = document.getElementById('settingsBtn');
+            popup.classList.toggle('hidden');
+            btn.classList.toggle('active', !popup.classList.contains('hidden'));
+        }
+
+        function tutupSettingsPopup() {
+            document.getElementById('settingsPopup').classList.add('hidden');
+            document.getElementById('settingsBtn').classList.remove('active');
+        }
+
+        function pilihOpsiUrutkan(jenisSort) {
+            currentSort = jenisSort;
+            localStorage.setItem('sort_setting_piutang', currentSort);
+            tutupSettingsPopup();
+            renderApp();
+        }
+
+        window.addEventListener('click', (e) => {
+            if (!e.target.closest('#settingsBtn') && !e.target.closest('#settingsPopup')) {
+                tutupSettingsPopup();
+            }
+        });
 
         function muatDataDariServer() {
             const tabelBody = document.getElementById('tabelData');
@@ -345,6 +430,18 @@
             document.getElementById('fHutang').className = statusFilter === 'Hutang' ? "font-bold py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-blue-600 bg-blue-600 text-white shadow-sm shrink-0" : "font-medium py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-blue-600 bg-white text-blue-700 shadow-sm shrink-0";
             document.getElementById('fLunas').className = statusFilter === 'Lunas' ? "font-bold py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-emerald-600 bg-emerald-600 text-white shadow-sm shrink-0" : "font-medium py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-emerald-600 bg-white text-emerald-700 shadow-sm shrink-0";
 
+            // Update styling aktif pada pop-up sort
+            ['date-desc', 'date-asc', 'input-desc', 'input-asc'].forEach(s => {
+                let el = document.getElementById('sort' + s.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(''));
+                if (el) {
+                    if (currentSort === s) {
+                        el.className = "w-full text-left px-2.5 py-2 text-xs rounded-lg transition cursor-pointer bg-blue-50 text-blue-700 font-bold flex justify-between items-center";
+                    } else {
+                        el.className = "w-full text-left px-2.5 py-2 text-xs rounded-lg transition cursor-pointer hover:bg-slate-100 text-slate-700 flex justify-between items-center";
+                    }
+                }
+            });
+
             let transaksiDitampilkan = transaksiAkunIni.filter(item => {
                 if (statusFilter === 'Semua') return true;
                 if (statusFilter === 'Piutang') return item.Kategori === 'Piutang';
@@ -353,7 +450,26 @@
                 return true;
             });
 
-            transaksiDitampilkan.reverse();
+            // Eksekusi Pengurutan Sesuai Pilihan
+            transaksiDitampilkan.sort((a, b) => {
+                let tA = new Date(a.Tanggal).getTime() || 0;
+                let tB = new Date(b.Tanggal).getTime() || 0;
+                let idA = String(a.ID || '');
+                let idB = String(b.ID || '');
+
+                if (currentSort === 'date-desc') {
+                    if (tB !== tA) return tB - tA;
+                    return idB.localeCompare(idA);
+                } else if (currentSort === 'date-asc') {
+                    if (tA !== tB) return tA - tB;
+                    return idA.localeCompare(idB);
+                } else if (currentSort === 'input-desc') {
+                    return idB.localeCompare(idA);
+                } else if (currentSort === 'input-asc') {
+                    return idA.localeCompare(idB);
+                }
+                return 0;
+            });
 
             const tabelData = document.getElementById('tabelData');
             tabelData.innerHTML = '';
@@ -456,7 +572,7 @@
 
         function bukaDetailTransaksi(id) {
             idTrxDetailAktif = id;
-            isModeEditSemua = false; // Reset ke mode tampilan biasa dulu saat dibuka
+            isModeEditSemua = false;
             let item = seluruhTransaksi.find(t => String(t.ID) === String(id));
             if (!item) return;
 
@@ -481,7 +597,6 @@
             let aksiEl = document.getElementById('aksiDetailTransaksi');
 
             if (!isModeEditSemua) {
-                // TAMPILAN DETAIL NORMAL (Keterangan tidak bisa diedit cepat lagi)
                 kontentEl.innerHTML = `
                     <div class="flex justify-between border-b border-slate-100 py-1.5"><span class="text-slate-600 font-medium">Nama Pihak:</span><span class="font-bold text-slate-900">${item.Nama}</span></div>
                     <div class="flex justify-between border-b border-slate-100 py-1.5"><span class="text-slate-600 font-medium">Tanggal:</span><span class="font-semibold text-slate-900">${tanggalFormatted}</span></div>
@@ -508,7 +623,6 @@
                     </div>
                 `;
             } else {
-                // TAMPILAN FORM EDIT SEMUA DETAIL
                 kontentEl.innerHTML = `
                     <div class="space-y-3">
                         <div>
