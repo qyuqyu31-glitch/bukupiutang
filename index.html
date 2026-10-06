@@ -933,7 +933,19 @@
             if (confirm(`Reset tampilan ke akun default?`)) gantiAkun("Pencatatan Piutang Toko");
         }
 
-        muatDataDariServer();
+        // ========================================================
+        // PEMANGGILAN OTOMATIS STABIL SAAT HALAMAN DIMUAT (LOAD)
+        // ========================================================
+        document.addEventListener("DOMContentLoaded", () => {
+            muatDataDariServer();
+        });
+
+        window.onload = function() {
+            // Sebagai pengaman tambahan untuk memastikan pemanggilan pasca resource selesai dimuat
+            if (seluruhTransaksi.length === 0) {
+                muatDataDariServer();
+            }
+        };
     </script>
 </body>
 </html>
