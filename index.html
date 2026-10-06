@@ -390,19 +390,42 @@
                 });
         }
 
-        function renderApp() {
-            document.getElementById('judulAkunAktif').innerText = akunAktif;
-            document.getElementById('labelAkunDiMenu').innerText = akunAktif;
-
+        function ambilDaftarAkunTersimpan() {
+            let saved = localStorage.getItem('daftar_akun_piutang_online');
             let daftarAkunSet = new Set(["Pencatatan Piutang Toko"]);
+            
+            if (saved) {
+                try {
+                    JSON.parse(saved).forEach(a => daftarAkunSet.add(a));
+                } catch(e) {}
+            }
+            
+            // Masukkan juga akun yang melekat pada transaksi yang ada
             seluruhTransaksi.forEach(item => {
                 if (item.Akun) daftarAkunSet.add(item.Akun);
             });
 
+            return Array.from(daftarAkunSet);
+        }
+
+        function simpanDaftarAkunKeLocalStorage(daftarAkun) {
+            localStorage.setItem('daftar_akun_piutang_online', JSON.stringify(daftarAkun));
+        }
+
+        function renderApp() {
+            document.getElementById('judulAkunAktif').innerText = akunAktif;
+            document.getElementById('labelAkunDiMenu').innerText = akunAktif;
+
+            let daftarAkun = ambilDaftarAkunTersimpan();
+            if (!daftarAkun.includes(akunAktif)) {
+                daftarAkun.push(akunAktif);
+                simpanDaftarAkunKeLocalStorage(daftarAkun);
+            }
+
             const daftarPilihanAkunEl = document.getElementById('daftarPilihanAkun');
             daftarPilihanAkunEl.innerHTML = '';
             
-            daftarAkunSet.forEach(namaAkun => {
+            daftarAkun.forEach(namaAkun => {
                 let isAktif = (namaAkun === akunAktif);
                 let bgClass = isAktif ? 'bg-blue-100 text-blue-800 font-semibold' : 'text-slate-600 hover:bg-slate-100';
                 let iconCheck = isAktif ? ' ✓' : '';
@@ -910,6 +933,14 @@
         function gantiAkun(namaBaru) {
             akunAktif = namaBaru;
             localStorage.setItem('akun_aktif_piutang_ online', akunAktif);
+            
+            // Simpan ke daftar akun mandiri agar langsung tersimpan permanen walau belum ada transaksi
+            let daftarAkun = ambilDaftarAkunTersimpan();
+            if (!daftarAkun.includes(akunAktif)) {
+                daftarAkun.push(akunAktif);
+                simpanDaftarAkunKeLocalStorage(daftarAkun);
+            }
+
             statusFilter = 'Semua';
             itemTerpilihSet.clear();
             renderApp();
@@ -917,20 +948,44 @@
 
         function tambahBukuKasBaru() {
             let namaBaru = prompt("Masukkan nama Akun / Buku baru:");
-            if (namaBaru && namaBaru.trim() !== "") gantiAkun(namaBaru.trim());
+            if (namaBaru && namaBaru.trim() !== "") {
+                let bersih = namaBaru.trim();
+                let daftarAkun = ambilDaftarAkunTersimpan();
+                if (!daftarAkun.includes(bersih)) {
+                    daftarAkun.push(bersih);
+                    simpanDaftarAkunKeLocalStorage(daftarAkun);
+                }
+                gantiAkun(bersih);
+            }
         }
 
         function editNamaAkun() {
             let namaBaru = prompt("Ubah nama Akun:", akunAktif);
             if (namaBaru && namaBaru.trim() !== "") {
-                akunAktif = namaBaru.trim();
+                let bersih = namaBaru.trim();
+                let akun Lama = akunAktif;
+                akunAktif = bersih;
                 localStorage.setItem('akun_aktif_piutang_ online', akunAktif);
+                
+                let daftarAkun = ambilDaftarAkunTersimpan();
+                // Hapus nama lama jika ada, lalu masukkan yang baru
+                daftarAkun = daftarAkun.filter(a => a !== akunLama);
+                if (!daftarAkun.includes(bersih)) daftarAkun.push(bersih);
+                simpanDaftarAkunKeLocalStorage(daftarAkun);
+
                 renderApp();
             }
         }
 
         function hapusAkunAktif() {
-            if (confirm(`Reset tampilan ke akun default?`)) gantiAkun("Pencatatan Piutang Toko");
+            if (confirm(`Hapus akun "${akunAktif}" dari daftar pilihan dan kembali ke akun default?`)) {
+                let akunDihapus = akunAktif;
+                let daftarAkun = ambilDaftarAkunTersimpan();
+                daftarAkun = daftarAkun.filter(a => a !== akunDihapus);
+                simpanDaftarAkunKeLocalStorage(daftarAkun);
+
+                gantiAkun("Pencatatan Piutang Toko");
+            }
         }
 
         // ========================================================
