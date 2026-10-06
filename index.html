@@ -26,31 +26,36 @@
             box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(255, 255, 255, 0.5) !important;
             transform: translateY(2px) !important;
         }
+        /* Mencegah zoom otomatis di iOS saat fokus input */
+        @media (max-width: 640px) {
+            input, select, textarea {
+                font-size: 16px !important;
+            }
+        }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans select-none">
+<body class="bg-slate-50 text-slate-800 font-sans select-none antialiased">
 
     <!-- Container Utama -->
-    <div class="max-w-5xl mx-auto p-4 sm:p-6 pb-24">
+    <div class="max-w-5xl mx-auto px-3 sm:px-6 py-4 sm:py-6 pb-28">
         
         <!-- Header & Navigasi Akun -->
-        <header class="mb-6 bg-white p-3 sm:p-4 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between gap-3">
-            
-            <div class="flex items-center gap-3 w-full">
+        <header class="mb-4 sm:mb-6 bg-white p-3.5 sm:p-4 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3 w-full min-w-0">
                 <!-- Tombol Menu Pengaturan & Dropdown -->
                 <div class="relative z-30 shrink-0">
-                    <button type="button" id="btnMenuAkun" onclick="toggleMenuAksiAkun(event)" class="bg-slate-900 hover:bg-black text-white p-2.5 rounded-lg text-sm transition cursor-pointer flex items-center justify-center border border-white/20 shadow-sm" title="Menu Pengaturan">
+                    <button type="button" id="btnMenuAkun" onclick="toggleMenuAksiAkun(event)" class="bg-slate-900 hover:bg-black text-white p-2.5 sm:p-3 rounded-xl text-sm transition cursor-pointer flex items-center justify-center border border-white/20 shadow-sm active:scale-95" title="Menu Pengaturan">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
                         </svg>
                     </button>
 
                     <!-- Menu Dropdown Utama -->
-                    <div id="menuAksiAkun" class="hidden absolute left-0 mt-0 w-72 bg-white border border-t-0 border-slate-200 rounded-b-xl rounded-tr-xl shadow-2xl z-50 p-2 space-y-2">
+                    <div id="menuAksiAkun" class="hidden absolute left-0 mt-2 w-72 bg-white border border-slate-200 rounded-2xl shadow-2xl z-50 p-2 space-y-2">
                         <div class="text-xs font-semibold text-slate-400 px-3 py-1 uppercase tracking-wider border-b border-slate-100 mb-1">Pengaturan & Akun</div>
                         
                         <div class="relative">
-                            <button type="button" onclick="toggleSubMenuAkun(event)" class="w-full text-left px-3 py-2 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition flex items-center justify-between gap-2 cursor-pointer border border-slate-200">
+                            <button type="button" onclick="toggleSubMenuAkun(event)" class="w-full text-left px-3 py-2.5 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-blue-50 hover:text-blue-700 rounded-xl transition flex items-center justify-between gap-2 cursor-pointer border border-slate-200">
                                 <span class="truncate">🔄 Akun: <span id="labelAkunDiMenu" class="text-blue-600 font-bold">Nama Akun</span></span>
                                 <span class="text-slate-400">▾</span>
                             </button>
@@ -60,7 +65,7 @@
                             </div>
                         </div>
 
-                        <button type="button" onclick="hapusAkunAktif()" class="w-full text-left px-3 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 rounded-lg transition flex items-center gap-2 cursor-pointer">
+                        <button type="button" onclick="hapusAkunAktif()" class="w-full text-left px-3 py-2.5 text-xs font-semibold text-rose-600 hover:bg-rose-50 rounded-xl transition flex items-center gap-2 cursor-pointer">
                             🗑️ Hapus Akun Ini
                         </button>
                     </div>
@@ -69,177 +74,176 @@
                 <!-- Informasi Akun -->
                 <div class="flex flex-col min-w-0 flex-1">
                     <div class="flex items-center gap-2 flex-wrap">
-                        <h1 id="judulAkunAktif" class="text-base sm:text-xl font-bold text-slate-900 truncate">Pencatatan Piutang Toko</h1>
-                        <button type="button" onclick="editNamaAkun()" class="text-[11px] bg-slate-100 hover:bg-slate-200 text-slate-600 px-2 py-0.5 rounded transition font-medium border border-slate-300 cursor-pointer shrink-0" title="Ubah Nama">Edit</button>
+                        <h1 id="judulAkunAktif" class="text-sm sm:text-xl font-bold text-slate-900 truncate">Pencatatan Piutang Toko</h1>
+                        <button type="button" onclick="editNamaAkun()" class="text-[10px] sm:text-[11px] bg-slate-100 hover:bg-slate-200 text-slate-600 px-2 py-0.5 rounded-md transition font-medium border border-slate-300 cursor-pointer shrink-0" title="Ubah Nama">Edit</button>
                     </div>
                     <div class="flex items-center gap-2 flex-wrap mt-0.5">
-                        <span id="keteranganAkunAktif" class="text-xs text-slate-500 truncate italic">Sinkronisasi Real-Time Google Sheets</span>
+                        <span id="keteranganAkunAktif" class="text-[11px] sm:text-xs text-slate-500 truncate italic">Sinkronisasi Real-Time Google Sheets</span>
                     </div>
                 </div>
             </div>
-
         </header>
 
         <!-- KARTU RINGKASAN KEUANGAN -->
-        <div id="wrapperRingkasan" class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
-            <div class="bg-rose-50 border border-rose-200 p-3.5 rounded-xl shadow-sm">
-                <p class="text-[11px] uppercase tracking-wider text-rose-600 font-semibold">Total Piutang Aktif</p>
-                <p id="valTotalPiutangSaja" class="text-xl font-bold text-rose-700 mt-1">Rp 0</p>
+        <div id="wrapperRingkasan" class="grid grid-cols-2 gap-2.5 sm:gap-4 mb-4">
+            <div class="bg-rose-50 border border-rose-200 p-3 sm:p-4 rounded-2xl shadow-sm">
+                <p class="text-[10px] sm:text-[11px] uppercase tracking-wider text-rose-600 font-bold">Total Piutang Aktif</p>
+                <p id="valTotalPiutangSaja" class="text-base sm:text-2xl font-black text-rose-700 mt-1 truncate">Rp 0</p>
             </div>
-            <div class="bg-blue-50 border border-blue-200 p-3.5 rounded-xl shadow-sm">
-                <p class="text-[11px] uppercase tracking-wider text-blue-600 font-semibold">Total Hutang Aktif</p>
-                <p id="valTotalHutangSaja" class="text-xl font-bold text-blue-700 mt-1">Rp 0</p>
+            <div class="bg-blue-50 border border-blue-200 p-3 sm:p-4 rounded-2xl shadow-sm">
+                <p class="text-[10px] sm:text-[11px] uppercase tracking-wider text-blue-600 font-bold">Total Hutang Aktif</p>
+                <p id="valTotalHutangSaja" class="text-base sm:text-2xl font-black text-blue-700 mt-1 truncate">Rp 0</p>
             </div>
         </div>
 
         <!-- TOMBOL AKSI LANGSUNG -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
-            <button type="button" onclick="bukaFormPiutang('Piutang')" class="bg-rose-600 hover:bg-rose-700 text-white font-semibold py-3 px-4 rounded-xl text-sm transition cursor-pointer flex items-center justify-center gap-2 shadow-sm">
-                <span>📗</span> <span>Catat Piutang</span>
+        <div class="grid grid-cols-2 gap-2.5 sm:gap-4 mb-5">
+            <button type="button" onclick="bukaFormPiutang('Piutang')" class="bg-rose-600 hover:bg-rose-700 active:scale-95 text-white font-semibold py-3 px-3 sm:px-4 rounded-2xl text-xs sm:text-sm transition cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 shadow-sm">
+                <span>📗</span> <span class="truncate">Catat Piutang</span>
             </button>
-            <button type="button" onclick="bukaFormPiutang('Hutang')" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-xl text-sm transition cursor-pointer flex items-center justify-center gap-2 shadow-sm">
-                <span>📕</span> <span>Catat Hutang</span>
+            <button type="button" onclick="bukaFormPiutang('Hutang')" class="bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-semibold py-3 px-3 sm:px-4 rounded-2xl text-xs sm:text-sm transition cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 shadow-sm">
+                <span>📕</span> <span class="truncate">Catat Hutang</span>
             </button>
         </div>
 
         <!-- FORM: PIUTANG -->
-        <div id="containerFormPiutang" class="hidden p-5 shadow-md mb-6 transition-all bg-rose-50 border-2 border-rose-600 rounded-xl">
+        <div id="containerFormPiutang" class="hidden p-4 sm:p-6 shadow-xl mb-5 transition-all bg-rose-50 border-2 border-rose-600 rounded-2xl">
             <div class="flex justify-between items-center mb-4 pb-2 border-b border-black/10">
-                <h2 class="text-base font-bold text-slate-900">📗 Form Catat Piutang Baru</h2>
-                <button type="button" onclick="tutupForm()" class="text-slate-700 hover:text-slate-900 font-bold text-sm px-2 py-1 cursor-pointer">✕ Tutup</button>
+                <h2 class="text-sm sm:text-base font-bold text-slate-900">📗 Form Catat Piutang Baru</h2>
+                <button type="button" onclick="tutupForm()" class="text-slate-700 hover:text-slate-900 font-bold text-xs sm:text-sm px-2 py-1 cursor-pointer">✕ Tutup</button>
             </div>
-            <form id="formPiutang" onsubmit="simpanTransaksiOnline(event, 'Piutang')" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <form id="formPiutang" onsubmit="simpanTransaksiOnline(event, 'Piutang')" class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
                     <label class="block text-xs font-semibold text-slate-800 mb-1">Tanggal Transaksi</label>
-                    <input type="date" id="tanggalPiutang" required class="w-full px-3 py-2 bg-white border border-slate-400 rounded-lg text-sm shadow-sm">
+                    <input type="date" id="tanggalPiutang" required class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-xl text-sm shadow-sm outline-none focus:border-rose-500">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-800 mb-1">Nama Pihak / Debitur</label>
-                    <input type="text" id="namaPiutang" required placeholder="Contoh: Bpk. Budi" class="w-full px-3 py-2 bg-white border border-slate-400 rounded-lg text-sm shadow-sm">
+                    <input type="text" id="namaPiutang" required placeholder="Contoh: Bpk. Budi" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-xl text-sm shadow-sm outline-none focus:border-rose-500">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-800 mb-1">Nominal Piutang (Rp)</label>
-                    <input type="text" id="jumlahPiutang" inputmode="numeric" required placeholder="Contoh: Rp 500.000" oninput="formatInputRupiah(this)" class="w-full px-3 py-2 bg-white border border-slate-400 rounded-lg text-sm font-semibold shadow-sm">
+                    <input type="text" id="jumlahPiutang" inputmode="numeric" required placeholder="Contoh: Rp 500.000" oninput="formatInputRupiah(this)" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-xl text-sm font-semibold shadow-sm outline-none focus:border-rose-500">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-800 mb-1">Keterangan / Keperluan</label>
-                    <input type="text" id="keteranganPiutang" placeholder="Contoh: Pinjaman" class="w-full px-3 py-2 bg-white border border-slate-400 rounded-lg text-sm shadow-sm">
+                    <input type="text" id="keteranganPiutang" placeholder="Contoh: Pinjaman" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-xl text-sm shadow-sm outline-none focus:border-rose-500">
                 </div>
                 <div class="sm:col-span-2 flex gap-2 pt-2">
-                    <button type="submit" id="btnSubmitPiutang" class="flex-1 bg-rose-600 hover:bg-rose-700 text-white font-medium py-3 px-4 rounded-lg text-sm shadow-sm cursor-pointer">Simpan Piutang</button>
-                    <button type="button" onclick="tutupForm()" class="bg-white hover:bg-slate-100 text-slate-800 font-medium py-3 px-4 rounded-lg text-sm border border-slate-400 shadow-sm cursor-pointer">Batal</button>
+                    <button type="submit" id="btnSubmitPiutang" class="flex-1 bg-rose-600 hover:bg-rose-700 active:scale-95 text-white font-semibold py-3 px-4 rounded-xl text-sm shadow-sm cursor-pointer transition">Simpan Piutang</button>
+                    <button type="button" onclick="tutupForm()" class="bg-white hover:bg-slate-100 text-slate-800 font-medium py-3 px-4 rounded-xl text-sm border border-slate-300 shadow-sm cursor-pointer">Batal</button>
                 </div>
             </form>
         </div>
 
         <!-- FORM: HUTANG -->
-        <div id="containerFormHutang" class="hidden p-5 shadow-md mb-6 transition-all bg-blue-50 border-2 border-blue-600 rounded-xl">
+        <div id="containerFormHutang" class="hidden p-4 sm:p-6 shadow-xl mb-5 transition-all bg-blue-50 border-2 border-blue-600 rounded-2xl">
             <div class="flex justify-between items-center mb-4 pb-2 border-b border-black/10">
-                <h2 class="text-base font-bold text-slate-900">📕 Form Catat Hutang Baru</h2>
-                <button type="button" onclick="tutupForm()" class="text-slate-700 hover:text-slate-900 font-bold text-sm px-2 py-1 cursor-pointer">✕ Tutup</button>
+                <h2 class="text-sm sm:text-base font-bold text-slate-900">📕 Form Catat Hutang Baru</h2>
+                <button type="button" onclick="tutupForm()" class="text-slate-700 hover:text-slate-900 font-bold text-xs sm:text-sm px-2 py-1 cursor-pointer">✕ Tutup</button>
             </div>
-            <form id="formHutang" onsubmit="simpanTransaksiOnline(event, 'Hutang')" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <form id="formHutang" onsubmit="simpanTransaksiOnline(event, 'Hutang')" class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
                     <label class="block text-xs font-semibold text-slate-800 mb-1">Tanggal Transaksi</label>
-                    <input type="date" id="tanggalHutang" required class="w-full px-3 py-2 bg-white border border-slate-400 rounded-lg text-sm shadow-sm">
+                    <input type="date" id="tanggalHutang" required class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-xl text-sm shadow-sm outline-none focus:border-blue-500">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-800 mb-1">Nama Pihak / Kreditur</label>
-                    <input type="text" id="namaHutang" required placeholder="Contoh: Supplier" class="w-full px-3 py-2 bg-white border border-slate-400 rounded-lg text-sm shadow-sm">
+                    <input type="text" id="namaHutang" required placeholder="Contoh: Supplier" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-xl text-sm shadow-sm outline-none focus:border-blue-500">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-800 mb-1">Nominal Hutang (Rp)</label>
-                    <input type="text" id="jumlahHutang" inputmode="numeric" required placeholder="Contoh: Rp 1.000.000" oninput="formatInputRupiah(this)" class="w-full px-3 py-2 bg-white border border-slate-400 rounded-lg text-sm font-semibold shadow-sm">
+                    <input type="text" id="jumlahHutang" inputmode="numeric" required placeholder="Contoh: Rp 1.000.000" oninput="formatInputRupiah(this)" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-xl text-sm font-semibold shadow-sm outline-none focus:border-blue-500">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-800 mb-1">Keterangan / Keperluan</label>
-                    <input type="text" id="keteranganHutang" placeholder="Contoh: Utang barang" class="w-full px-3 py-2 bg-white border border-slate-400 rounded-lg text-sm shadow-sm">
+                    <input type="text" id="keteranganHutang" placeholder="Contoh: Utang barang" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-xl text-sm shadow-sm outline-none focus:border-blue-500">
                 </div>
                 <div class="sm:col-span-2 flex gap-2 pt-2">
-                    <button type="submit" id="btnSubmitHutang" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg text-sm shadow-sm cursor-pointer">Simpan Hutang</button>
-                    <button type="button" onclick="tutupForm()" class="bg-white hover:bg-slate-100 text-slate-800 font-medium py-3 px-4 rounded-lg text-sm border border-slate-400 shadow-sm cursor-pointer">Batal</button>
+                    <button type="submit" id="btnSubmitHutang" class="flex-1 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-semibold py-3 px-4 rounded-xl text-sm shadow-sm cursor-pointer transition">Simpan Hutang</button>
+                    <button type="button" onclick="tutupForm()" class="bg-white hover:bg-slate-100 text-slate-800 font-medium py-3 px-4 rounded-xl text-sm border border-slate-300 shadow-sm cursor-pointer">Batal</button>
                 </div>
             </form>
         </div>
 
         <!-- MODAL / KARTU INFORMASI LENGKAP DETAIL TRANSAKSI -->
-        <div id="modalDetail" style="display: none;" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-            <div id="kotakKontenDetail" class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-300 transition-all">
-                <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-200">
-                    <h3 id="judulModalDetail" class="text-base font-bold text-slate-900">📋 Detail Transaksi</h3>
+        <div id="modalDetail" style="display: none;" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+            <div id="kotakKontenDetail" class="bg-white rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl border border-slate-300 transition-all max-h-[90vh] overflow-y-auto">
+                <div class="flex justify-between items-center mb-3 pb-2 border-b border-slate-200">
+                    <h3 id="judulModalDetail" class="text-sm sm:text-base font-bold text-slate-900">📋 Detail Transaksi</h3>
                     <button type="button" onclick="tutupModalDetailManual()" class="text-slate-600 hover:text-slate-900 font-bold text-base px-2 py-1 cursor-pointer">✕</button>
                 </div>
-                <div id="kontenDetailTransaksi" class="space-y-3 text-sm mb-6"></div>
-                <div id="aksiDetailTransaksi" class="flex flex-wrap gap-2 justify-end items-center"></div>
+                <div id="kontenDetailTransaksi" class="space-y-2.5 text-xs sm:text-sm mb-5"></div>
+                <div id="aksiDetailTransaksi" class="flex flex-wrap gap-2 justify-end items-center pt-2 border-t border-slate-100"></div>
             </div>
         </div>
 
         <!-- MODAL / POP UP KONFIRMASI TANGGAL PELUNASAN -->
-        <div id="modalPelunasan" style="display: none;" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-            <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200">
-                <h3 class="text-base font-bold text-slate-900 mb-2">✨ Konfirmasi Tanggal Pelunasan</h3>
-                <p class="text-xs text-slate-600 mb-4">Masukkan tanggal pelunasan transaksi ini. Jika dibiarkan kosong, tanggal otomatis disesuaikan hari ini.</p>
+        <div id="modalPelunasan" style="display: none;" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl border border-slate-200">
+                <h3 class="text-sm sm:text-base font-bold text-slate-900 mb-1.5">✨ Konfirmasi Tanggal Pelunasan</h3>
+                <p class="text-[11px] sm:text-xs text-slate-600 mb-4">Masukkan tanggal pelunasan transaksi ini. Jika dibiarkan kosong, tanggal otomatis disesuaikan hari ini.</p>
                 <form id="formModalPelunasan" onsubmit="prosesPelunasan(event)">
                     <input type="hidden" id="inputHiddenIdTrx">
                     <div class="mb-4">
                         <label class="block text-xs font-semibold text-slate-700 mb-1">Tanggal Pelunasan</label>
-                        <input type="date" id="tanggalPelunasanInput" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm shadow-sm">
+                        <input type="date" id="tanggalPelunasanInput" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm shadow-sm outline-none focus:border-emerald-500">
                     </div>
                     <div class="flex gap-2 justify-end">
-                        <button type="button" onclick="tutupModalPelunasan()" class="bg-white hover:bg-slate-100 text-slate-700 font-medium py-2 px-4 rounded-lg text-xs border border-slate-300 transition cursor-pointer">Batal</button>
-                        <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 px-4 rounded-lg text-xs transition cursor-pointer shadow-sm">Konfirmasi Lunas</button>
+                        <button type="button" onclick="tutupModalPelunasan()" class="bg-white hover:bg-slate-100 text-slate-700 font-medium py-2.5 px-4 rounded-xl text-xs border border-slate-300 transition cursor-pointer">Batal</button>
+                        <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-semibold py-2.5 px-4 rounded-xl text-xs transition cursor-pointer shadow-sm">Konfirmasi Lunas</button>
                     </div>
                 </form>
             </div>
         </div>
 
         <!-- ACTION BAR MASSAL -->
-        <div id="actionBarMassal" class="hidden fixed bottom-4 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-5 py-3 rounded-2xl shadow-2xl z-40 flex items-center gap-4 max-w-lg w-[90%] border border-slate-700 justify-between">
-            <span id="infoJumlahPilih" class="text-xs font-medium">0 dipilih</span>
-            <div class="flex gap-2">
-                <button type="button" onclick="bukaModalPelunasanMassal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-xl text-xs font-semibold transition cursor-pointer">Lunas Massal</button>
-                <button type="button" onclick="hapusMassal()" class="bg-rose-600 hover:bg-rose-700 text-white px-3 py-1.5 rounded-xl text-xs font-semibold transition cursor-pointer">Hapus Massal</button>
-                <button type="button" onclick="batalkanPilihan()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 px-3 py-1.5 rounded-xl text-xs transition cursor-pointer">Batal</button>
+        <div id="actionBarMassal" class="hidden fixed bottom-4 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-4 py-3 rounded-2xl shadow-2xl z-40 flex items-center gap-3 max-w-lg w-[92%] border border-slate-700 justify-between">
+            <span id="infoJumlahPilih" class="text-[11px] sm:text-xs font-medium truncate">0 dipilih</span>
+            <div class="flex items-center gap-1.5 shrink-0">
+                <button type="button" onclick="bukaModalPelunasanMassal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 sm:px-3 py-1.5 rounded-xl text-[11px] sm:text-xs font-semibold transition cursor-pointer">Lunas</button>
+                <button type="button" onclick="hapusMassal()" class="bg-rose-600 hover:bg-rose-700 text-white px-2.5 sm:px-3 py-1.5 rounded-xl text-[11px] sm:text-xs font-semibold transition cursor-pointer">Hapus</button>
+                <button type="button" onclick="batalkanPilihan()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 sm:px-3 py-1.5 rounded-xl text-[11px] sm:text-xs transition cursor-pointer border border-slate-700">Batal</button>
             </div>
         </div>
 
         <!-- TABEL & FILTER -->
-        <div class="shadow-sm overflow-hidden mb-6 bg-slate-100 border border-slate-300 rounded-xl">
+        <div class="shadow-sm overflow-hidden mb-6 bg-slate-100 border border-slate-300 rounded-2xl">
             <!-- Header Bar Tabel dengan Tombol Pengaturan 3D di Paling Kanan -->
             <div class="p-3 sm:p-4 border-b border-slate-300 bg-slate-100 flex items-center justify-between gap-2 flex-wrap relative">
-                <div id="filterContainer" class="flex flex-row items-center gap-1.5 sm:gap-2 overflow-x-auto whitespace-nowrap"></div>
+                <div id="filterContainer" class="flex flex-row items-center gap-1.5 overflow-x-auto whitespace-nowrap w-full sm:w-auto pb-1 sm:pb-0 scrollbar-none"></div>
                 
-                <div class="flex items-center gap-2">
-                    <button type="button" onclick="muatDataDariServer()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium px-3 py-2 rounded-lg transition cursor-pointer flex items-center gap-1 shadow-sm h-10">
+                <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                    <button type="button" onclick="muatDataDariServer()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium px-3 py-2 rounded-xl transition cursor-pointer flex items-center gap-1.5 shadow-sm h-10 active:scale-95">
                         <span>🔄</span> <span>Sinkronkan</span>
                     </button>
 
                     <!-- Tombol Pengaturan 3D Hitam Menonjol -->
                     <div class="relative">
-                        <button type="button" id="settingsBtn" onclick="toggleSettingsPopup(event)" class="settings-btn-3d text-white w-10 h-10 rounded-xl flex items-center justify-center cursor-pointer shadow-md" title="Pengaturan Tabel">
+                        <button type="button" id="settingsBtn" onclick="toggleSettingsPopup(event)" class="settings-btn-3d text-white w-10 h-10 rounded-xl flex items-center justify-center cursor-pointer shadow-md shrink-0" title="Pengaturan Tabel">
                             <svg class="w-5 h-5 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
                             </svg>
                         </button>
 
                         <!-- Pop-up Menu Pengaturan Tabel -->
-                        <div id="settingsPopup" class="hidden absolute right-0 mt-2 w-72 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 p-3">
+                        <div id="settingsPopup" class="hidden absolute right-0 mt-2 w-72 bg-white border border-slate-200 rounded-2xl shadow-2xl z-50 p-3">
                             <div class="flex justify-between items-center mb-2 pb-1 border-b border-slate-100">
                                 <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">Pengaturan Tabel</h3>
                                 <button type="button" onclick="tutupSettingsPopup()" class="text-slate-400 hover:text-slate-700 text-xs font-bold cursor-pointer">✕</button>
                             </div>
                             <div class="space-y-1">
                                 <p class="text-[11px] font-semibold text-slate-600 mb-1">Opsi Urutkan:</p>
-                                <button type="button" onclick="pilihOpsiUrutkan('date-desc')" id="sortDateDesc" class="w-full text-left px-2.5 py-2 text-xs rounded-lg transition cursor-pointer hover:bg-slate-100 text-slate-700 flex justify-between items-center">
+                                <button type="button" onclick="pilihOpsiUrutkan('date-desc')" id="sortDateDesc" class="w-full text-left px-2.5 py-2 text-xs rounded-xl transition cursor-pointer hover:bg-slate-100 text-slate-700 flex justify-between items-center">
                                     <span>📅 Tanggal Terbaru ke Terlama</span>
                                 </button>
-                                <button type="button" onclick="pilihOpsiUrutkan('date-asc')" id="sortDateAsc" class="w-full text-left px-2.5 py-2 text-xs rounded-lg transition cursor-pointer hover:bg-slate-100 text-slate-700 flex justify-between items-center">
+                                <button type="button" onclick="pilihOpsiUrutkan('date-asc')" id="sortDateAsc" class="w-full text-left px-2.5 py-2 text-xs rounded-xl transition cursor-pointer hover:bg-slate-100 text-slate-700 flex justify-between items-center">
                                     <span>📆 Tanggal Terlama ke Terbaru</span>
                                 </button>
-                                <button type="button" onclick="pilihOpsiUrutkan('input-desc')" id="sortInputDesc" class="w-full text-left px-2.5 py-2 text-xs rounded-lg transition cursor-pointer hover:bg-slate-100 text-slate-700 flex justify-between items-center">
+                                <button type="button" onclick="pilihOpsiUrutkan('input-desc')" id="sortInputDesc" class="w-full text-left px-2.5 py-2 text-xs rounded-xl transition cursor-pointer hover:bg-slate-100 text-slate-700 flex justify-between items-center">
                                     <span>📥 Pencatatan Transaksi Terbaru</span>
                                 </button>
-                                <button type="button" onclick="pilihOpsiUrutkan('input-asc')" id="sortInputAsc" class="w-full text-left px-2.5 py-2 text-xs rounded-lg transition cursor-pointer hover:bg-slate-100 text-slate-700 flex justify-between items-center">
+                                <button type="button" onclick="pilihOpsiUrutkan('input-asc')" id="sortInputAsc" class="w-full text-left px-2.5 py-2 text-xs rounded-xl transition cursor-pointer hover:bg-slate-100 text-slate-700 flex justify-between items-center">
                                     <span>📤 Catatan Transaksi Terlama</span>
                                 </button>
                             </div>
@@ -248,24 +252,33 @@
                 </div>
             </div>
 
-            <div class="overflow-x-auto bg-white">
-                <table class="w-full text-left border-collapse text-sm">
-                    <thead>
-                        <tr class="bg-slate-200 text-slate-700 uppercase text-xs">
-                            <th class="p-3 w-16 text-center">✓ / 🔍</th>
-                            <th class="p-3">Tanggal</th>
-                            <th class="p-3">Nama Pihak</th>
-                            <th class="p-3">Kategori</th>
-                            <th class="p-3">Jumlah</th>
-                            <th class="p-3">Keterangan</th>
-                            <th class="p-3">Status</th>
-                            <th class="p-3 text-center">Aksi (Lunas / Hapus)</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabelData" class="divide-y divide-slate-200">
-                        <tr><td colspan="8" class="p-4 text-center text-slate-400 italic">Memuat data dari server...</td></tr>
-                    </tbody>
-                </table>
+            <!-- Tabel Responsif Seluler (Card View di Mobile, Table View di Desktop) -->
+            <div class="bg-white">
+                <!-- Tampilan Mobile (Card Stacked) agar tidak perlu scroll ke samping -->
+                <div id="tabelDataMobile" class="block sm:hidden divide-y divide-slate-100">
+                    <div class="p-4 text-center text-slate-400 italic text-xs">Memuat data dari server...</div>
+                </div>
+
+                <!-- Tampilan Desktop (Table Standard) -->
+                <div class="hidden sm:block overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-slate-200 text-slate-700 uppercase text-xs">
+                                <th class="p-3 w-16 text-center">✓ / 🔍</th>
+                                <th class="p-3">Tanggal</th>
+                                <th class="p-3">Nama Pihak</th>
+                                <th class="p-3">Kategori</th>
+                                <th class="p-3">Jumlah</th>
+                                <th class="p-3">Keterangan</th>
+                                <th class="p-3">Status</th>
+                                <th class="p-3 text-center">Aksi (Lunas / Hapus)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelDataDesktop" class="divide-y divide-slate-200">
+                            <tr><td colspan="8" class="p-4 text-center text-slate-400 italic">Memuat data dari server...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -355,8 +368,11 @@
         });
 
         function muatDataDariServer() {
-            const tabelBody = document.getElementById('tabelData');
-            tabelBody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-blue-600 font-medium italic">Menghubungkan ke server...</td></tr>`;
+            const tabelDesktop = document.getElementById('tabelDataDesktop');
+            const tabelMobile = document.getElementById('tabelDataMobile');
+            
+            tabelDesktop.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-blue-600 font-medium italic">Menghubungkan ke server...</td></tr>`;
+            tabelMobile.innerHTML = `<div class="p-4 text-center text-blue-600 font-medium italic text-xs">Menghubungkan ke server...</div>`;
 
             fetch(WEB_APP_URL)
                 .then(response => response.json())
@@ -369,7 +385,8 @@
                 })
                 .catch(error => {
                     console.error('Gagal memuat:', error);
-                    tabelBody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-rose-600 font-medium">Gagal memuat data. Cek koneksi internet/URL Apps Script.</td></tr>`;
+                    tabelDesktop.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-rose-600 font-medium">Gagal memuat data. Cek koneksi internet/URL Apps Script.</td></tr>`;
+                    tabelMobile.innerHTML = `<div class="p-4 text-center text-rose-600 font-medium text-xs">Gagal memuat data. Cek koneksi internet.</div>`;
                 });
         }
 
@@ -392,7 +409,7 @@
 
                 let itemBtn = document.createElement('button');
                 itemBtn.type = 'button';
-                itemBtn.className = `w-full text-left px-2.5 py-1.5 text-xs rounded-lg transition cursor-pointer flex justify-between items-center ${bgClass}`;
+                itemBtn.className = `w-full text-left px-2.5 py-2 text-xs rounded-xl transition cursor-pointer flex justify-between items-center ${bgClass}`;
                 itemBtn.innerHTML = `<span class="truncate">${namaAkun}</span><span class="text-blue-600 font-bold shrink-0">${iconCheck}</span>`;
                 itemBtn.onclick = () => { gantiAkun(namaAkun); tutupMenuAksi(); };
                 daftarPilihanAkunEl.appendChild(itemBtn);
@@ -400,7 +417,7 @@
 
             let btnBuatAkunBaru = document.createElement('button');
             btnBuatAkunBaru.type = 'button';
-            btnBuatAkunBaru.className = 'w-full text-left px-2.5 py-2 text-xs font-semibold text-blue-600 hover:bg-blue-50 rounded-lg transition flex items-center gap-2 cursor-pointer mt-1 border-t border-slate-100 pt-2';
+            btnBuatAkunBaru.className = 'w-full text-left px-2.5 py-2 text-xs font-semibold text-blue-600 hover:bg-blue-50 rounded-xl transition flex items-center gap-2 cursor-pointer mt-1 border-t border-slate-100 pt-2';
             btnBuatAkunBaru.innerHTML = '➕ Buat Buku/Akun Baru';
             btnBuatAkunBaru.onclick = () => tambahBukuKasBaru();
             daftarPilihanAkunEl.appendChild(btnBuatAkunBaru);
@@ -419,25 +436,24 @@
 
             const filterContainer = document.getElementById('filterContainer');
             filterContainer.innerHTML = `
-                <button type="button" onclick="setFilter('Semua')" id="fSemua" class="font-medium py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 shadow-sm shrink-0"><span>📋</span> <span>Semua</span></button>
-                <button type="button" onclick="setFilter('Piutang')" id="fPiutang" class="font-medium py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 shadow-sm shrink-0"><span>📗</span> <span>Piutang</span></button>
-                <button type="button" onclick="setFilter('Hutang')" id="fHutang" class="font-medium py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 shadow-sm shrink-0"><span>📕</span> <span>Hutang</span></button>
-                <button type="button" onclick="setFilter('Lunas')" id="fLunas" class="font-medium py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 shadow-sm shrink-0"><span>✨</span> <span>Lunas</span></button>
+                <button type="button" onclick="setFilter('Semua')" id="fSemua" class="font-medium py-1.5 px-3 rounded-xl text-[11px] transition cursor-pointer flex items-center justify-center gap-1 shadow-sm shrink-0"><span>📋</span> <span>Semua</span></button>
+                <button type="button" onclick="setFilter('Piutang')" id="fPiutang" class="font-medium py-1.5 px-3 rounded-xl text-[11px] transition cursor-pointer flex items-center justify-center gap-1 shadow-sm shrink-0"><span>📗</span> <span>Piutang</span></button>
+                <button type="button" onclick="setFilter('Hutang')" id="fHutang" class="font-medium py-1.5 px-3 rounded-xl text-[11px] transition cursor-pointer flex items-center justify-center gap-1 shadow-sm shrink-0"><span>📕</span> <span>Hutang</span></button>
+                <button type="button" onclick="setFilter('Lunas')" id="fLunas" class="font-medium py-1.5 px-3 rounded-xl text-[11px] transition cursor-pointer flex items-center justify-center gap-1 shadow-sm shrink-0"><span>✨</span> <span>Lunas</span></button>
             `;
 
-            document.getElementById('fSemua').className = statusFilter === 'Semua' ? "font-bold py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-slate-900 bg-slate-900 text-white shadow-sm shrink-0" : "font-medium py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-slate-300 bg-white text-slate-700 shadow-sm shrink-0";
-            document.getElementById('fPiutang').className = statusFilter === 'Piutang' ? "font-bold py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-rose-600 bg-rose-600 text-white shadow-sm shrink-0" : "font-medium py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-rose-600 bg-white text-rose-700 shadow-sm shrink-0";
-            document.getElementById('fHutang').className = statusFilter === 'Hutang' ? "font-bold py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-blue-600 bg-blue-600 text-white shadow-sm shrink-0" : "font-medium py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-blue-600 bg-white text-blue-700 shadow-sm shrink-0";
-            document.getElementById('fLunas').className = statusFilter === 'Lunas' ? "font-bold py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-emerald-600 bg-emerald-600 text-white shadow-sm shrink-0" : "font-medium py-1.5 px-2.5 rounded-lg text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-emerald-600 bg-white text-emerald-700 shadow-sm shrink-0";
+            document.getElementById('fSemua').className = statusFilter === 'Semua' ? "font-bold py-1.5 px-3 rounded-xl text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-slate-900 bg-slate-900 text-white shadow-sm shrink-0" : "font-medium py-1.5 px-3 rounded-xl text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-slate-300 bg-white text-slate-700 shadow-sm shrink-0";
+            document.getElementById('fPiutang').className = statusFilter === 'Piutang' ? "font-bold py-1.5 px-3 rounded-xl text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-rose-600 bg-rose-600 text-white shadow-sm shrink-0" : "font-medium py-1.5 px-3 rounded-xl text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-rose-600 bg-white text-rose-700 shadow-sm shrink-0";
+            document.getElementById('fHutang').className = statusFilter === 'Hutang' ? "font-bold py-1.5 px-3 rounded-xl text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-blue-600 bg-blue-600 text-white shadow-sm shrink-0" : "font-medium py-1.5 px-3 rounded-xl text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-blue-600 bg-white text-blue-700 shadow-sm shrink-0";
+            document.getElementById('fLunas').className = statusFilter === 'Lunas' ? "font-bold py-1.5 px-3 rounded-xl text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-emerald-600 bg-emerald-600 text-white shadow-sm shrink-0" : "font-medium py-1.5 px-3 rounded-xl text-[11px] transition cursor-pointer flex items-center justify-center gap-1 border border-emerald-600 bg-white text-emerald-700 shadow-sm shrink-0";
 
-            // Update styling aktif pada pop-up sort
             ['date-desc', 'date-asc', 'input-desc', 'input-asc'].forEach(s => {
                 let el = document.getElementById('sort' + s.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(''));
                 if (el) {
                     if (currentSort === s) {
-                        el.className = "w-full text-left px-2.5 py-2 text-xs rounded-lg transition cursor-pointer bg-blue-50 text-blue-700 font-bold flex justify-between items-center";
+                        el.className = "w-full text-left px-2.5 py-2 text-xs rounded-xl transition cursor-pointer bg-blue-50 text-blue-700 font-bold flex justify-between items-center";
                     } else {
-                        el.className = "w-full text-left px-2.5 py-2 text-xs rounded-lg transition cursor-pointer hover:bg-slate-100 text-slate-700 flex justify-between items-center";
+                        el.className = "w-full text-left px-2.5 py-2 text-xs rounded-xl transition cursor-pointer hover:bg-slate-100 text-slate-700 flex justify-between items-center";
                     }
                 }
             });
@@ -450,7 +466,6 @@
                 return true;
             });
 
-            // Eksekusi Pengurutan Sesuai Pilihan
             transaksiDitampilkan.sort((a, b) => {
                 let tA = new Date(a.Tanggal).getTime() || 0;
                 let tB = new Date(b.Tanggal).getTime() || 0;
@@ -471,11 +486,17 @@
                 return 0;
             });
 
-            const tabelData = document.getElementById('tabelData');
-            tabelData.innerHTML = '';
+            const tabelDesktop = document.getElementById('tabelDataDesktop');
+            const tabelMobile = document.getElementById('tabelDataMobile');
+            
+            tabelDesktop.innerHTML = '';
+            tabelMobile.innerHTML = '';
 
             if (transaksiDitampilkan.length === 0) {
-                tabelData.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-slate-400 italic">Belum ada data transaksi di kategori ini.</td></tr>`;
+                let kosongHTML = `<tr><td colspan="8" class="p-4 text-center text-slate-400 italic">Belum ada data transaksi di kategori ini.</td></tr>`;
+                let kosongMobileHTML = `<div class="p-6 text-center text-slate-400 italic text-xs">Belum ada data transaksi di kategori ini.</div>`;
+                tabelDesktop.innerHTML = kosongHTML;
+                tabelMobile.innerHTML = kosongMobileHTML;
                 return;
             }
 
@@ -491,18 +512,19 @@
                 if (item.Kategori === 'Piutang' || item.Kategori === 'Hutang') {
                     bgRowClass = item.Kategori === 'Piutang' ? "bg-rose-200 hover:bg-rose-300" : "bg-blue-200 hover:bg-blue-300";
                     teksKategori = item.Kategori;
-                    teksStatus = `<span class="px-2 py-0.5 rounded text-xs font-bold ${item.Kategori === 'Piutang' ? 'bg-rose-700' : 'bg-blue-700'} text-white">Belum Lunas</span>`;
-                    tombolAksiLunas = `<button type="button" data-id="${item.ID}" class="btn-lunaskan bg-gradient-to-b from-emerald-500 to-emerald-700 hover:from-emerald-400 hover:to-emerald-600 active:translate-y-1 text-white px-3.5 py-1.5 rounded-xl text-xs font-bold shadow-[0_3px_0_0_#047857] active:shadow-none transition-all cursor-pointer">Lunaskan</button>`;
+                    teksStatus = `<span class="px-2 py-0.5 rounded text-[10px] sm:text-xs font-bold ${item.Kategori === 'Piutang' ? 'bg-rose-700' : 'bg-blue-700'} text-white">Belum Lunas</span>`;
+                    tombolAksiLunas = `<button type="button" data-id="${item.ID}" class="btn-lunaskan bg-gradient-to-b from-emerald-500 to-emerald-700 hover:from-emerald-400 hover:to-emerald-600 active:translate-y-1 text-white px-3 py-1.5 rounded-xl text-xs font-bold shadow-[0_3px_0_0_#047857] active:shadow-none transition-all cursor-pointer">Lunaskan</button>`;
                 } else {
                     bgRowClass = "bg-emerald-200 hover:bg-emerald-300";
                     teksKategori = item.Kategori.replace(' Lunas', '');
-                    teksStatus = '<span class="px-2 py-0.5 rounded text-xs font-bold bg-emerald-700 text-white">Lunas</span>';
-                    tombolAksiLunas = `<button type="button" disabled class="bg-slate-300 text-slate-600 px-3 py-1 rounded-xl text-xs font-bold shadow-inner cursor-not-allowed">Lunaskan</button>`;
+                    teksStatus = '<span class="px-2 py-0.5 rounded text-[10px] sm:text-xs font-bold bg-emerald-700 text-white">Lunas</span>';
+                    tombolAksiLunas = `<button type="button" disabled class="bg-slate-300 text-slate-600 px-3 py-1.5 rounded-xl text-xs font-bold shadow-inner cursor-not-allowed">Lunaskan</button>`;
                 }
 
                 let isChecked = itemTerpilihSet.has(item.ID);
                 let tanggalFormatted = formatTanggalIndo(item.Tanggal);
 
+                // --- RENDER TABEL DESKTOP ---
                 let tr = document.createElement('tr');
                 tr.className = `${bgRowClass} transition-colors`;
                 tr.innerHTML = `
@@ -518,8 +540,34 @@
                     <td class="p-3">${teksStatus}</td>
                     <td class="p-3 text-center flex items-center justify-center gap-1.5">${tombolAksiLunas} ${tombolAksiHapus}</td>
                 `;
+                tabelDesktop.appendChild(tr);
 
-                tabelData.appendChild(tr);
+                // --- RENDER CARD MOBILE ---
+                let cardMobile = document.createElement('div');
+                cardMobile.className = `${bgRowClass} p-3.5 flex flex-col gap-2 transition-colors border-b border-slate-200 last:border-none`;
+                cardMobile.innerHTML = `
+                    <div class="flex items-center justify-between gap-2">
+                        <div class="flex items-center gap-2 min-w-0">
+                            <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="togglePilihItem('${item.ID}')" class="w-4 h-4 rounded cursor-pointer shrink-0">
+                            <span class="font-bold text-slate-900 text-sm truncate">${item.Nama}</span>
+                        </div>
+                        <div class="shrink-0">${teksStatus}</div>
+                    </div>
+                    <div class="flex items-center justify-between text-xs text-slate-700">
+                        <span class="font-semibold text-slate-900">Rp ${Number(item.Jumlah).toLocaleString('id-ID')}</span>
+                        <span class="bg-black/10 px-2 py-0.5 rounded font-medium">${teksKategori}</span>
+                    </div>
+                    ${item.Keterangan ? `<div class="text-xs text-slate-600 italic">Ket: ${item.Keterangan}</div>` : ''}
+                    <div class="flex items-center justify-between pt-1 border-t border-black/5 mt-0.5">
+                        <span class="text-[11px] text-slate-500 font-medium">📅 ${tanggalFormatted}</span>
+                        <div class="flex items-center gap-1.5">
+                            <button type="button" data-id="${item.ID}" class="btn-detail bg-white/80 hover:bg-white text-slate-700 px-2.5 py-1 rounded-lg text-xs font-bold transition shadow-sm border border-slate-300">🔍 Detail</button>
+                            ${item.Kategori === 'Piutang' || item.Kategori === 'Hutang' ? `<button type="button" data-id="${item.ID}" class="btn-lunaskan bg-emerald-600 text-white px-2.5 py-1 rounded-lg text-xs font-bold shadow-sm">Lunas</button>` : ''}
+                            <button type="button" data-id="${item.ID}" class="btn-hapus bg-rose-600 text-white px-2.5 py-1 rounded-lg text-xs font-bold shadow-sm">Hapus</button>
+                        </div>
+                    </div>
+                `;
+                tabelMobile.appendChild(cardMobile);
             });
 
             document.querySelectorAll('.btn-detail').forEach(btn => {
@@ -564,7 +612,7 @@
             const info = document.getElementById('infoJumlahPilih');
             if (itemTerpilihSet.size > 0) {
                 bar.classList.remove('hidden');
-                info.innerText = `${itemTerpilihSet.size} transaksi dipilih`;
+                info.innerText = `${itemTerpilihSet.size} dipilih`;
             } else {
                 bar.classList.add('hidden');
             }
@@ -588,10 +636,10 @@
             let statusStr = isLunas ? 'Lunas' : 'Belum Lunas';
 
             let kotakKonten = document.getElementById('kotakKontenDetail');
-            kotakKonten.className = "bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border transition-all ";
+            kotakKonten.className = "bg-white rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl border transition-all ";
             kotakKonten.classList.add(item.Kategori === 'Piutang' ? 'border-rose-400' : (item.Kategori === 'Hutang' ? 'border-blue-400' : 'border-emerald-400'));
 
-            document.getElementById('judulModalDetail').innerText = isModeEditSemua ? "✏️ Edit Semua Detail Transaksi" : "📋 Detail Transaksi";
+            document.getElementById('judulModalDetail').innerText = isModeEditSemua ? "✏️ Edit Semua Detail" : "📋 Detail Transaksi";
 
             let kontentEl = document.getElementById('kontenDetailTransaksi');
             let aksiEl = document.getElementById('aksiDetailTransaksi');
@@ -617,7 +665,7 @@
                         <a href="${linkWA}" target="_blank" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 px-3 rounded-xl text-xs transition cursor-pointer shadow-sm flex items-center gap-1.5" title="Kirim WhatsApp">${logoWA}</a>
                     </div>
                     <div class="flex items-center gap-1.5 flex-wrap justify-end">
-                        <button type="button" onclick="toggleModeEditSemua()" class="bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 px-3 rounded-xl text-xs shadow-sm cursor-pointer transition">Edit Semua Detail</button>
+                        <button type="button" onclick="toggleModeEditSemua()" class="bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 px-3 rounded-xl text-xs shadow-sm cursor-pointer transition">Edit</button>
                         ${tombolLunasDetail}
                         <button type="button" onclick="hapusDataOnline('${item.ID}')" class="bg-rose-600 hover:bg-rose-700 text-white font-medium py-2 px-3 rounded-xl text-xs transition cursor-pointer shadow-sm">Hapus</button>
                     </div>
@@ -627,34 +675,34 @@
                     <div class="space-y-3">
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Tanggal Transaksi</label>
-                            <input type="date" id="editSemuaTanggal" value="${tanggalRaw}" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm shadow-sm focus:bg-white focus:border-blue-500 outline-none">
+                            <input type="date" id="editSemuaTanggal" value="${tanggalRaw}" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm shadow-sm focus:bg-white focus:border-blue-500 outline-none">
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Pihak</label>
-                            <input type="text" id="editSemuaNama" value="${item.Nama || ''}" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm shadow-sm focus:bg-white focus:border-blue-500 outline-none">
+                            <input type="text" id="editSemuaNama" value="${item.Nama || ''}" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm shadow-sm focus:bg-white focus:border-blue-500 outline-none">
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Jenis Kategori</label>
-                            <select id="editSemuaKategori" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm shadow-sm focus:bg-white focus:border-blue-500 outline-none">
+                            <select id="editSemuaKategori" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm shadow-sm focus:bg-white focus:border-blue-500 outline-none">
                                 <option value="Piutang" ${kategoriAsli === 'Piutang' ? 'selected' : ''}>Piutang</option>
                                 <option value="Hutang" ${kategoriAsli === 'Hutang' ? 'selected' : ''}>Hutang</option>
                             </select>
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Nominal (Rp)</label>
-                            <input type="text" id="editSemuaJumlah" value="Rp ${Number(item.Jumlah).toLocaleString('id-ID')}" inputmode="numeric" oninput="formatInputRupiah(this)" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm font-semibold shadow-sm focus:bg-white focus:border-blue-500 outline-none">
+                            <input type="text" id="editSemuaJumlah" value="Rp ${Number(item.Jumlah).toLocaleString('id-ID')}" inputmode="numeric" oninput="formatInputRupiah(this)" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-semibold shadow-sm focus:bg-white focus:border-blue-500 outline-none">
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Keterangan</label>
-                            <input type="text" id="editSemuaKeterangan" value="${item.Keterangan || ''}" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm shadow-sm focus:bg-white focus:border-blue-500 outline-none">
+                            <input type="text" id="editSemuaKeterangan" value="${item.Keterangan || ''}" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm shadow-sm focus:bg-white focus:border-blue-500 outline-none">
                         </div>
                     </div>
                 `;
 
                 aksiEl.innerHTML = `
                     <div class="flex items-center gap-2 justify-end w-full">
-                        <button type="button" onclick="toggleModeEditSemua()" class="bg-white hover:bg-slate-100 text-slate-700 font-medium py-2 px-4 rounded-xl text-xs border border-slate-300 transition cursor-pointer">Batal</button>
-                        <button type="button" onclick="simpanEditSemuaDetail('${item.ID}')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-xl text-xs shadow-sm cursor-pointer transition">Simpan Semua Perubahan</button>
+                        <button type="button" onclick="toggleModeEditSemua()" class="bg-white hover:bg-slate-100 text-slate-700 font-medium py-2.5 px-4 rounded-xl text-xs border border-slate-300 transition cursor-pointer">Batal</button>
+                        <button type="button" onclick="simpanEditSemuaDetail('${item.ID}')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-4 rounded-xl text-xs shadow-sm cursor-pointer transition">Simpan</button>
                     </div>
                 `;
             }
