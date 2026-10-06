@@ -215,7 +215,7 @@
 
     <!-- Skrip JavaScript Online -->
     <script>
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbySo-7JjaBNNYQuDD0j32EHTeQ8fUxZKxvNNQliZ1o1iMTGm7IeyQB4US8z-YoLC6_W2g/exec";
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyx15XSAgXhYxUvIqlK3Tcrifn5HlZouCPgcCHIrWUgJqzXojKHur6ab-y8ocVcADNX5g/exec";
         
         let seluruhTransaksi = [];
         let akunAktif = localStorage.getItem('akun_aktif_piutang_ online') || "Pencatatan Piutang Toko";
@@ -481,16 +481,13 @@
             let aksiEl = document.getElementById('aksiDetailTransaksi');
 
             if (!isModeEditSemua) {
-                // TAMPILAN DETAIL NORMAL
+                // TAMPILAN DETAIL NORMAL (Keterangan tidak bisa diedit cepat lagi)
                 kontentEl.innerHTML = `
                     <div class="flex justify-between border-b border-slate-100 py-1.5"><span class="text-slate-600 font-medium">Nama Pihak:</span><span class="font-bold text-slate-900">${item.Nama}</span></div>
                     <div class="flex justify-between border-b border-slate-100 py-1.5"><span class="text-slate-600 font-medium">Tanggal:</span><span class="font-semibold text-slate-900">${tanggalFormatted}</span></div>
                     <div class="flex justify-between border-b border-slate-100 py-1.5"><span class="text-slate-600 font-medium">Jenis Transaksi:</span><span class="font-semibold text-slate-900">${kategoriAsli}</span></div>
                     <div class="flex justify-between border-b border-slate-100 py-1.5"><span class="text-slate-600 font-medium">Nominal:</span><span class="font-bold text-slate-900">Rp ${Number(item.Jumlah).toLocaleString('id-ID')}</span></div>
-                    <div class="flex flex-col gap-1 border-b border-slate-100 py-1.5">
-                        <span class="text-slate-600 font-medium">Keterangan (Dapat Diedit Cepat):</span>
-                        <input type="text" id="inputEditKeterangan" value="${item.Keterangan || ''}" placeholder="Masukkan keterangan..." class="w-full px-3 py-1.5 bg-slate-50 border border-slate-300 rounded-lg text-sm text-slate-900 focus:bg-white focus:border-blue-500 outline-none transition shadow-sm">
-                    </div>
+                    <div class="flex justify-between border-b border-slate-100 py-1.5"><span class="text-slate-600 font-medium">Keterangan:</span><span class="text-slate-900 font-medium">${item.Keterangan || '-'}</span></div>
                     <div class="flex justify-between border-b border-slate-100 py-1.5"><span class="text-slate-600 font-medium">Status:</span><span class="font-bold ${isLunas ? 'text-emerald-700' : 'text-rose-700'}">${statusStr}</span></div>
                     <div class="flex justify-between py-1.5"><span class="text-slate-600 font-medium">Buku / Akun:</span><span class="text-slate-900 font-medium">${item.Akun || 'Pencatatan Piutang Toko'}</span></div>
                 `;
@@ -506,7 +503,6 @@
                     </div>
                     <div class="flex items-center gap-1.5 flex-wrap justify-end">
                         <button type="button" onclick="toggleModeEditSemua()" class="bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 px-3 rounded-xl text-xs shadow-sm cursor-pointer transition">Edit Semua Detail</button>
-                        <button type="button" onclick="simpanEditKeterangan('${item.ID}')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded-xl text-xs shadow-sm cursor-pointer transition">Simpan Ket.</button>
                         ${tombolLunasDetail}
                         <button type="button" onclick="hapusDataOnline('${item.ID}')" class="bg-rose-600 hover:bg-rose-700 text-white font-medium py-2 px-3 rounded-xl text-xs transition cursor-pointer shadow-sm">Hapus</button>
                     </div>
@@ -571,7 +567,6 @@
             let target = seluruhTransaksi.find(t => String(t.ID) === String(idTrx));
             if (!target) return;
 
-            // Jika status sebelumnya lunas, sesuaikan kategori akhir dengan status lunas-nya
             let apakahLunas = target.Kategori.includes('Lunas');
             let kategoriFinal = apakahLunas ? katPilihan + ' Lunas' : katPilihan;
 
@@ -595,26 +590,6 @@
                     jumlah: jmlBaru,
                     keterangan: ketBaru
                 })
-            })
-            .then(() => muatDataDariServer())
-            .catch(() => muatDataDariServer());
-        }
-
-        function simpanEditKeterangan(idTrx) {
-            let inputBaru = document.getElementById('inputEditKeterangan');
-            if (!inputBaru) return;
-            let keteranganBaru = inputBaru.value.trim();
-
-            let target = seluruhTransaksi.find(t => String(t.ID) === String(idTrx));
-            if (!target) return;
-
-            target.Keterangan = keteranganBaru;
-            renderApp();
-            tutupModalDetailManual();
-
-            fetch(WEB_APP_URL, {
-                method: 'POST',
-                body: JSON.stringify({ action: 'editKeterangan', id: String(idTrx), keteranganBaru: keteranganBaru })
             })
             .then(() => muatDataDariServer())
             .catch(() => muatDataDariServer());
