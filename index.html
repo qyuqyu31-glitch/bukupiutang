@@ -290,7 +290,7 @@
     </div>
 
     <script>
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwoxkBuZAXN03v6nv2S9W3XETIDo1_7SUtURvsW-x-x_uanh0XonCsSa7ERTQSWjFpmeg/exec";
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyZQz-WhH-zNBPYPctoRoVCwxoxy9nSMFvVoBK4DVK_BlvdP1wApjrIS2poXzePHuscxQ/exec";
         
         let seluruhTransaksi = [];
         let akunAktif = localStorage.getItem('akun_aktif_piutang_ online') || "Pencatatan Piutang Toko";
@@ -545,28 +545,37 @@
             let wrapperRiwayat = document.getElementById('wrapperRiwayatCicilan');
             let listRiwayat = document.getElementById('daftarRiwayatCicilan');
 
-            // Ambil riwayat cicilan tersimpan dari local storage / objek jika ada
+            // Ambil riwayat cicilan tersimpan dari local storage
             let riwayatList = JSON.parse(localStorage.getItem('riwayat_cicil_' + item.ID) || '[]');
+            
+            // Hitung total cicilan yang sudah dibayarkan
+            let totalCicil = riwayatList.reduce((sum, r) => sum + Number(r.nominal), 0);
+            
+            // Tentukan jumlah awal (jika properti JumlahAwal ada di item, gunakan. Jika belum, fallback ke jumlah saat ini + total cicil)
+            let jumlahAwal = item.JumlahAwal ? Number(item.JumlahAwal) : (Number(item.Jumlah) + totalCicil);
+            let sisaTagihan = Number(item.Jumlah);
 
             if (!isModeEditSemua) {
                 wrapperRiwayat.style.display = 'block';
                 if (riwayatList.length > 0) {
                     listRiwayat.innerHTML = '';
                     riwayatList.forEach((r, idx) => {
-                        listRiwayat.innerHTML += `<div class="bg-slate-50 p-2 rounded-xl border border-slate-200 flex justify-between items-center">
+                        listRiwayat.innerHTML += `<div class="bg-slate-50 p-2 rounded-xl border border-slate-200 flex justify-between items-center text-xs">
                             <span>Cicil ke-${idx+1} (${formatTanggalIndo(r.tanggal)})</span>
                             <span class="font-bold text-amber-600">+Rp ${Number(r.nominal).toLocaleString('id-ID')}</span>
                         </div>`;
                     });
                 } else {
-                    listRiwayat.innerHTML = `<p class="text-slate-400 italic">Belum ada riwayat cicilan.</p>`;
+                    listRiwayat.innerHTML = `<p class="text-slate-400 italic text-xs">Belum ada riwayat cicilan.</p>`;
                 }
 
                 konten.innerHTML = `
                     <div class="flex justify-between border-b border-slate-100 py-1"><span class="text-slate-600">Nama Pihak:</span><span class="font-bold">${item.Nama}</span></div>
                     <div class="flex justify-between border-b border-slate-100 py-1"><span class="text-slate-600">Tanggal:</span><span class="font-semibold">${tglFmt}</span></div>
                     <div class="flex justify-between border-b border-slate-100 py-1"><span class="text-slate-600">Kategori:</span><span class="font-semibold">${kategoriAsli}</span></div>
-                    <div class="flex justify-between border-b border-slate-100 py-1"><span class="text-slate-600">Sisa Tagihan:</span><span class="font-bold text-slate-900">Rp ${Number(item.Jumlah).toLocaleString('id-ID')}</span></div>
+                    <div class="flex justify-between border-b border-slate-100 py-1 bg-slate-50 px-2 rounded"><span class="text-slate-700 font-medium">Nominal Awal:</span><span class="font-bold text-slate-900">Rp ${jumlahAwal.toLocaleString('id-ID')}</span></div>
+                    <div class="flex justify-between border-b border-slate-100 py-1 px-2"><span class="text-slate-600">Sudah Dicicil:</span><span class="font-bold text-amber-600">Rp ${totalCicil.toLocaleString('id-ID')}</span></div>
+                    <div class="flex justify-between border-b border-slate-100 py-1 bg-rose-50/50 px-2 rounded"><span class="text-rose-700 font-semibold">Sisa Tagihan:</span><span class="font-black text-rose-700">Rp ${sisaTagihan.toLocaleString('id-ID')}</span></div>
                     <div class="flex justify-between border-b border-slate-100 py-1"><span class="text-slate-600">Keterangan:</span><span>${item.Keterangan || '-'}</span></div>
                     <div class="flex justify-between py-1"><span class="text-slate-600">Status:</span><span class="font-bold ${isLunas ? 'text-emerald-700' : 'text-rose-700'}">${isLunas ? 'Lunas' : 'Belum Lunas'}</span></div>
                 `;
