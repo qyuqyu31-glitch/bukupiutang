@@ -97,6 +97,13 @@
             </button>
         </div>
 
+        <!-- TOMBOL MENU DIREKTORI PIHAK -->
+<div class="mb-5">
+    <button type="button" onclick="bukaModalDirektoriPihak()" class="w-full bg-slate-900 hover:bg-black active:scale-95 text-white font-semibold py-3 px-4 rounded-2xl text-xs sm:text-sm transition cursor-pointer flex items-center justify-center gap-2 shadow-sm">
+        <span>👥</span> <span>Buku Direktori Pihak / Pelanggan</span>
+    </button>
+</div>
+
         <!-- FORM: PIUTANG -->
         <div id="containerFormPiutang" class="hidden p-4 sm:p-6 shadow-xl mb-5 transition-all bg-rose-50 border-2 border-rose-600 rounded-2xl">
             <div class="flex justify-between items-center mb-4 pb-2 border-b border-black/10">
@@ -288,6 +295,18 @@
             </div>
         </div>
     </div>
+
+    <!-- MODAL DIREKTORI & PROFIL PIHAK -->
+<div id="modalDirektori" style="display: none;" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-2xl w-full p-5 sm:p-6 shadow-2xl border border-slate-300 max-h-[90vh] overflow-y-auto">
+        <div class="flex justify-between items-center mb-3 pb-2 border-b border-slate-200">
+            <h3 id="judulModalDirektori" class="text-sm sm:text-base font-bold text-slate-900">👥 Direktori Pihak / Pelanggan</h3>
+            <button type="button" onclick="tutupModalDirektori()" class="text-slate-600 hover:text-slate-900 font-bold text-base px-2 py-1 cursor-pointer">✕</button>
+        </div>
+        <!-- Konten Direktori (Daftar Nama atau Detail Pihak) -->
+        <div id="isiDirektoriPihak" class="space-y-3"></div>
+    </div>
+</div>
 
     <script>
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyZQz-WhH-zNBPYPctoRoVCwxoxy9nSMFvVoBK4DVK_BlvdP1wApjrIS2poXzePHuscxQ/exec";
@@ -790,6 +809,130 @@
         function hapusAkunAktif() {
             if (confirm(`Hapus akun "${akunAktif}"?`)) gantiAkun("Pencatatan Piutang Toko");
         }
+
+        function bukaModalDirektoriPihak() {
+    renderDaftarPihak();
+    document.getElementById('modalDirektori').style.display = 'flex';
+}
+
+function tutupModalDirektori() {
+    document.getElementById('modalDirektori').style.display = 'none';
+}
+
+function renderDaftarPihak() {
+    document.getElementById('judulModalDirektori').innerText = "👥 Direktori Pihak / Pelanggan";
+    let container = document.getElementById('isiDirektoriPihak');
+    
+    // Ambil transaksi di akun aktif saja
+    let transaksiAkunIni = seluruhTransaksi.filter(item => (item.Akun || "Pencatatan Piutang Toko") === akunAktif);
+    
+    // Kelompokkan data berdasarkan Nama Pihak (case-insensitive trim)
+    let petaPihak = {};
+    transaksiAkunIni.forEach(item => {
+        let namaPihak = (item.Nama || "").trim();
+        if (!namaPihak) return;
+        
+        if (!petaPihak[namaPihak]) {
+            petaPihak[namaPihak] = { totalPiutang: 0, totalHutang: 0, jumlahTransaksi: 0, listTrx: [] };
+        }
+        
+        petaPihak[namaPihak].jumlahTransaksi++;
+        petaPihak[namaPihak].listTrx.push(item);
+        
+        let jml = Number(item.Jumlah);
+        if (item.Kategori === 'Piutang') petaPihak[namaPihak].totalPiutang += jml;
+        else if (item.Kategori === 'Hutang') petaPihak[namaPihak].totalHutang += jml;
+    });
+
+    let daftarNama = Object.keys(petaPihak);
+    if (daftarNama.length === 0) {
+        container.innerHTML = `<p class="text-center text-slate-400 italic py-6 text-xs">Belum ada data pihak/pelanggan yang tercatat di akun ini.</p>`;
+        return;
+    }
+
+    let html = `
+        <p class="text-xs text-slate-500 mb-2">Klik nama pihak di bawah untuk melihat rekam jejak dan riwayat transaksinya:</p>
+        <div class="space-y-2">
+    `;
+
+    daftarNama.sort().forEach(nama => {
+        let info = petaPihak[nama];
+        html += `
+            <div onclick="bukaDetailPihak('${nama.replace(/'/g, "\\'")}')" class="bg-slate-50 hover:bg-blue-50/50 border border-slate-200 hover:border-blue-300 p-3.5 rounded-xl transition cursor-pointer flex items-center justify-between gap-3">
+                <div class="min-w-0">
+                    <h4 class="font-bold text-slate-900 text-sm truncate">👤 ${nama}</h4>
+                    <p class="text-[11px] text-slate-500">${info.jumlahTransaksi} catatan transaksi</p>
+                </div>
+                <div class="text-right shrink-0">
+                    ${info.totalPiutang > 0 ? `<div class="text-xs font-bold text-rose-600">Piutang: Rp ${info.totalPiutang.toLocaleString('id-ID')}</div>` : ''}
+                    ${info.totalHutang > 0 ? `<div class="text-xs font-bold text-blue-600">Hutang: Rp ${info.totalHutang.toLocaleString('id-ID')}</div>` : ''}
+                    ${info.totalPiutang === 0 && info.totalHutang === 0 ? `<div class="text-xs font-bold text-emerald-600">Semua Lunas</div>` : ''}
+                </div>
+            </div>
+        `;
+    });
+
+    html += `</div>`;
+    container.innerHTML = html;
+}
+
+function bukaDetailPihak(namaPihak) {
+    document.getElementById('judulModalDirektori').innerText = `📂 Riwayat: ${namaPihak}`;
+    let container = document.getElementById('isiDirektoriPihak');
+    
+    let transaksiPihak = seluruhTransaksi.filter(item => 
+        (item.Akun || "Pencatatan Piutang Toko") === akunAktif && 
+        (item.Nama || "").trim().toLowerCase() === namaPihak.toLowerCase()
+    );
+
+    let html = `
+        <button type="button" onclick="renderDaftarPihak()" class="text-xs font-bold text-blue-600 hover:underline mb-3 inline-flex items-center gap-1 cursor-pointer">
+            ← Kembali ke Daftar Pihak
+        </button>
+        <div class="space-y-3">
+    `;
+
+    transaksiPihak.forEach(item => {
+        let isLunas = item.Kategori.includes('Lunas');
+        let kategoriAsli = item.Kategori.replace(' Lunas', '');
+        let tglFmt = formatTanggalIndo(item.Tanggal);
+        let riwayatCicil = JSON.parse(localStorage.getItem('riwayat_cicil_' + item.ID) || '[]');
+
+        html += `
+            <div class="bg-white border ${isLunas ? 'border-emerald-300 bg-emerald-50/20' : 'border-slate-300'} p-3.5 rounded-xl shadow-xs space-y-2">
+                <div class="flex justify-between items-center text-xs">
+                    <span class="font-bold text-slate-800">📅 ${tglFmt} — <span class="bg-slate-100 px-2 py-0.5 rounded">${kategoriAsli}</span></span>
+                    <span class="font-bold ${isLunas ? 'text-emerald-700' : 'text-rose-700'}">${isLunas ? 'Lunas' : 'Belum Lunas'}</span>
+                </div>
+                <div class="flex justify-between items-center text-sm">
+                    <span class="text-slate-600 text-xs">Sisa Tagihan:</span>
+                    <span class="font-black text-slate-900">Rp ${Number(item.Jumlah).toLocaleString('id-ID')}</span>
+                </div>
+                ${item.Keterangan ? `<div class="text-xs text-slate-500 italic">Ket: ${item.Keterangan}</div>` : ''}
+        `;
+
+        if (riwayatList = riwayatCicil.length > 0) {
+            html += `<div class="mt-2 pt-2 border-t border-slate-100 space-y-1"><p class="text-[10px] font-bold text-slate-400 uppercase">Riwayat Cicilan:</p>`;
+            riwayatCicil.forEach((r, idx) => {
+                html += `<div class="text-[11px] flex justify-between text-slate-600 bg-slate-50 px-2 py-1 rounded">
+                    <span>Cicil ke-${idx+1} (${formatTanggalIndo(r.tanggal)})</span>
+                    <span class="font-bold text-amber-600">+Rp ${Number(r.nominal).toLocaleString('id-ID')}</span>
+                </div>`;
+            });
+            html += `</div>`;
+        }
+
+        html += `
+                <div class="pt-2 flex justify-end gap-1.5 border-t border-slate-100">
+                    <button type="button" onclick="tutupModalDirektori(); bukaDetailTransaksi('${item.ID}')" class="bg-slate-800 hover:bg-black text-white text-[11px] font-bold px-3 py-1.5 rounded-lg cursor-pointer">Buka Detail Trx</button>
+                </div>
+            </div>
+        `;
+    });
+
+    html += `</div>`;
+    container.innerHTML = html;
+}
 
         document.addEventListener("DOMContentLoaded", () => muatDataDariServer());
     </script>
